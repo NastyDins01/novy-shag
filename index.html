@@ -1,313 +1,372 @@
-)
-    keys.right = true;
+<!DOCTYPE html>
 
-});
 
-document.addEventListener("keyup", e => {
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Новый Шаг</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#111827;
+  color:white;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+}
+#game{
+  display:block;
+  width:100vw;
+  height:100vh;
+  background:#8ecf75;
+}
+#info{
+  position:fixed;
+  top:10px;
+  left:10px;
+  right:10px;
+  padding:12px;
+  background:rgba(0,0,0,.72);
+  border-radius:14px;
+  z-index:5;
+}
+#quest{
+  margin-top:6px;
+  font-size:14px;
+}
+#message{
+  position:fixed;
+  left:50%;
+  bottom:120px;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.8);
+  padding:12px 18px;
+  border-radius:12px;
+  display:none;
+  z-index:10;
+  text-align:center;
+}
+#buttons{
+  position:fixed;
+  bottom:18px;
+  left:18px;
+  z-index:10;
+}
+button{
+  border:0;
+  border-radius:12px;
+  padding:14px 18px;
+  margin:4px;
+  font-size:16px;
+  font-weight:bold;
+}
+#up,#down{display:block;margin:auto}
+#right{margin-left:55px}
+#interact{
+  position:fixed;
+  right:20px;
+  bottom:35px;
+  z-index:10;
+  background:#facc15;
+}
+</style>
+</head>
 
-  if (e.key === "ArrowUp" || e.key === "w")
-    keys.up = false;
 
-  if (e.key === "ArrowDown" || e.key === "s")
-    keys.down = false;
+<body>
 
-  if (e.key === "ArrowLeft" || e.key === "a")
-    keys.left = false;
 
-  if (e.key === "ArrowRight" || e.key === "d")
-    keys.right = false;
+<div id="info">
+  💰 <span id="money">500</span>
+  &nbsp; ⭐ XP: <span id="xp">0</span>
+  &nbsp; 🏆 Уровень: <span id="level">1</span>
+  <div id="quest">Задание: Подойди к Алине.</div>
+</div>
 
-});
 
-const Alina = {
-  x: W - 150,
-  y: 190
+<div id="message"></div>
+
+
+<div id="buttons">
+  <button id="up">⬆️</button>
+  <button id="left">⬅️</button>
+  <button id="down">⬇️</button>
+  <button id="right">➡️</button>
+</div>
+
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+let player={
+  x:100,
+  y:canvas.height-120,
+  speed:4
 };
 
-const Post = {
-  x: 140,
-  y: H - 160
+let save={
+  money:500,
+  xp:0,
+  level:1,
+  quest:0
 };
 
-const Shop = {
-  x: 140,
-  y: 120
-};
+const Alina={x:canvas.width-150,y:180};
+const Post={x:150,y:canvas.height-180};
+const Shop={x:150,y:140};
+const Cafe={x:canvas.width-190,y:100};
 
-function distance(a,b) {
-  return Math.hypot(
-    a.x - b.x,
-    a.y - b.y
-  );
+function distance(a,b){
+  return Math.hypot(a.x-b.x,a.y-b.y);
 }
 
-function message(text) {
-
-  const box =
-    document.getElementById("message");
-
-  box.textContent = text;
-  box.style.display = "block";
-
-  clearTimeout(window.messageTimer);
-
-  window.messageTimer =
-    setTimeout(() => {
-      box.style.display = "none";
-    }, 3000);
+function message(text){
+  const box=document.getElementById("message");
+  box.textContent=text;
+  box.style.display="block";
+  setTimeout(()=>box.style.display="none",2500);
 }
 
-function updateInterface() {
+function updateInterface(){
+  document.getElementById("money").textContent=save.money;
+  document.getElementById("xp").textContent=save.xp;
+  document.getElementById("level").textContent=save.level;
 
-  document.getElementById("money").textContent =
-    save.money;
+  let q="";
 
-  document.getElementById("xp").textContent =
-    save.xp;
+  if(save.quest===0)
+    q="Задание: Подойди к Алине возле кафе.";
+  if(save.quest===1)
+    q="Задание: Забери 📦 посылку возле почты.";
+  if(save.quest===2)
+    q="Задание: Отнеси 📦 посылку на почту.";
+  if(save.quest===3)
+    q="Задание выполнено! Вернись к Алине.";
 
-  document.getElementById("level").textContent =
-    save.level;
-
-  const quest =
-    document.getElementById("questText");
-
-  if (save.quest === 0) {
-
-    quest.textContent =
-      "Подойди к Алине возле кафе.";
-
-  }
-
-  if (save.quest === 1) {
-
-    quest.textContent =
-      "Забери 📦 посылку возле почты.";
-
-  }
-
-  if (save.quest === 2) {
-
-    quest.textContent =
-      "Отнеси 📦 посылку на почту.";
-
-  }
-
-  if (save.quest === 3) {
-
-    quest.textContent =
-      "Задание выполнено! Вернись к Алине.";
-
-  }
-
+  document.getElementById("quest").textContent=q;
 }
 
-function interact() {
+function building(x,y,w,h,color,name){
+  ctx.fillStyle=color;
+  ctx.fillRect(x,y,w,h);
 
-  if (distance(save, Alina) < 90) {
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x+15,y+18,30,25);
+  ctx.fillRect(x+w-45,y+18,30,25);
 
-    if (save.quest === 0) {
+  ctx.fillStyle="#333";
+  ctx.fillRect(x+w/2-15,y+h-45,30,45);
 
-      save.quest = 1;
-
-      message(
-        "Алина: Привет! Возьми посылку возле почты и принеси её обратно."
-      );
-
-    }
-
-    else if (save.quest === 3) {
-
-      message(
-        "Алина: Отличная работа! Скоро будет новое задание."
-      );
-
-    }
-
-    else {
-
-      message(
-        "Алина: Сначала выполни текущее задание."
-      );
-
-    }
-
-    saveGame();
-    updateInterface();
-
-    return;
-  }
-
-  if (
-    save.quest === 1 &&
-    distance(save, Post) < 90
-  ) {
-
-    save.quest = 2;
-
-    message(
-      "Ты забрала посылку! Теперь отнеси её на почту."
-    );
-
-    saveGame();
-    updateInterface();
-
-    return;
-  }
-
-  if (
-    save.quest === 2 &&
-    distance(save, Post) < 90
-  ) {
-
-    save.quest = 3;
-
-    save.money += 300;
-    save.xp += 150;
-
-    while (
-      save.xp >= save.level * 200
-    ) {
-
-      save.xp -= save.level * 200;
-      save.level++;
-
-    }
-
-    message(
-      "🎉 Задание выполнено! +300 монет и +150 XP"
-    );
-
-    saveGame();
-    updateInterface();
-
-    return;
-  }
-
-  if (distance(save, Shop) < 100) {
-
-    if (save.money >= 100) {
-
-      save.money -= 100;
-
-      save.inventory.push("🍔 Еда");
-
-      message(
-        "Ты купила еду за 100 монет."
-      );
-
-    } else {
-
-      message(
-        "Недостаточно денег."
-      );
-
-    }
-
-    saveGame();
-    updateInterface();
-
-    return;
-  }
-
-  message(
-    "Подойди ближе к персонажу или зданию."
-  );
-
+  ctx.fillStyle="#111";
+  ctx.font="bold 15px Arial";
+  ctx.fillText(name,x+10,y+h/2);
 }
 
-document
-  .getElementById("interact")
-  .addEventListener("click", interact);
-
-document
-  .getElementById("shop")
-  .addEventListener("click", interact);
-
-document
-  .getElementById("reset")
-  .addEventListener("click", () => {
-
-    localStorage.removeItem("novyShag");
-    location.reload();
-
-  });
-
-function building(x,y,w,h,color,name) {
-
-  ctx.fillStyle = color;
-
-  ctx.fillRect(
-    x,
-    y,
-    w,
-    h
-  );
-
-  ctx.fillStyle = "#ffffff";
-
-  ctx.fillRect(
-    x + 15,
-    y + 15,
-    30,
-    25
-  );
-
-  ctx.fillRect(
-    x + w - 45,
-    y + 15,
-    30,
-    25
-  );
-
-  ctx.fillStyle = "#222";
-
-  ctx.font = "bold 14px Arial";
-
-  ctx.fillText(
-    name,
-    x + 10,
-    y + h / 2
-  );
-
-}
-
-function drawNPC(x,y,color,name) {
-
-  ctx.fillStyle = "#f2c7a5";
-
+function npc(x,y,color,name){
+  ctx.fillStyle=color;
   ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y - 18,
-    12,
-    0,
-    Math.PI * 2
-  );
-
+  ctx.arc(x,y,22,0,Math.PI*2);
   ctx.fill();
 
-  ctx.fillStyle = color;
-
-  ctx.fillRect(
-    x - 12,
-    y - 5,
-    24,
-    30
-  );
-
-  ctx.fillStyle = "#111";
-
-  ctx.font = "bold 13px Arial";
-
-  ctx.fillText(
-    name,
-    x - 30,
-    y + 42
-  );
-
+  ctx.fillStyle="#222";
+  ctx.font="bold 14px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(name,x,y-32);
+  ctx.textAlign="left";
 }
 
-function drawPlayer() {
+function drawPlayer(){
+  ctx.fillStyle="#2563eb";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y,18,0,Math.PI*2);
+  ctx.fill();
 
-  ctx.fill
+  ctx.fillStyle="#fff";
+  ctx.beginPath();
+  ctx.arc(player.x-6,player.y-3,3,0,Math.PI*2);
+  ctx.arc(player.x+6,player.y-3,3,0,Math.PI*2);
+  ctx.fill();
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // трава
+  ctx.fillStyle="#8ecf75";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // дороги
+  ctx.fillStyle="#777";
+  ctx.fillRect(0,canvas.height/2-45,canvas.width,90);
+  ctx.fillRect(canvas.width/2-45,0,90,canvas.height);
+
+  // здания
+  building(40,70,180,120,"#e8b86a","МАГАЗИН");
+  building(canvas.width-240,60,190,130,"#d98b8b","КАФЕ");
+  building(40,canvas.height-250,200,150,"#91b9d8","ПОЧТА");
+
+  // парк
+  ctx.fillStyle="#63a653";
+  ctx.beginPath();
+  ctx.arc(canvas.width/2,canvas.height/2,100,0,Math.PI*2);
+  ctx.fill();
+
+  // NPC
+  npc(Alina.x,Alina.y,"#ec4899","Алина");
+
+  // объекты
+  ctx.font="30px Arial";
+  ctx.fillText("📦",Post.x-15,Post.y);
+  ctx.fillText("🛒",Shop.x+55,Shop.y+55);
+
+  drawPlayer();
+
+  requestAnimationFrame(draw);
+}
+
+const keys={
+  up:false,
+  down:false,
+  left:false,
+  right:false
+};
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp"||e.key.toLowerCase()==="w") keys.up=true;
+  if(e.key==="ArrowDown"||e.key.toLowerCase()==="s") keys.down=true;
+  if(e.key==="ArrowLeft"||e.key.toLowerCase()==="a") keys.left=true;
+  if(e.key==="ArrowRight"||e.key.toLowerCase()==="d") keys.right=true;
+});
+
+document.addEventListener("keyup",e=>{
+  if(e.key==="ArrowUp"||e.key.toLowerCase()==="w") keys.up=false;
+  if(e.key==="ArrowDown"||e.key.toLowerCase()==="s") keys.down=false;
+  if(e.key==="ArrowLeft"||e.key.toLowerCase()==="a") keys.left=false;
+  if(e.key==="ArrowRight"||e.key.toLowerCase()==="d") keys.right=false;
+});
+
+function move(){
+  if(keys.up) player.y-=player.speed;
+  if(keys.down) player.y+=player.speed;
+  if(keys.left) player.x-=player.speed;
+  if(keys.right) player.x+=player.speed;
+
+  player.x=Math.max(20,Math.min(canvas.width-20,player.x));
+  player.y=Math.max(70,Math.min(canvas.height-20,player.y));
+
+  requestAnimationFrame(move);
+}
+
+function interact(){
+
+  if(distance(player,Alina)<80){
+
+    if(save
+
+
+==0){
+      save.quest=1;
+      message("Алина: Привет! Возьми посылку возле почты 📦");
+    }
+    else if(save.quest===3){
+      message("Алина: Отличная работа! Скоро будет новое задание.");
+    }
+    else{
+      message("Алина: Сначала выполни текущее задание.");
+    }
+
+    updateInterface();
+    return;
+  }
+
+  if(save.quest===1 && distance(player,Post)<80){
+    save.quest=2;
+    message("Ты забрала посылку! Теперь отнеси её на почту.");
+    updateInterface();
+    return;
+  }
+
+  if(save.quest===2 && distance(player,Post)<80){
+    save.quest=3;
+    save.money+=300;
+    save.xp+=150;
+
+    if(save.xp>=200){
+      save.xp-=200;
+      save.level++;
+    }
+
+    message("🎉 Задание выполнено! +300 монет и +150 XP");
+    updateInterface();
+    return;
+  }
+
+  if(distance(player,Shop)<100){
+    if(save.money>=100){
+      save.money-=100;
+      message("🛒 Ты купила еду за 100 монет.");
+      updateInterface();
+    }else{
+      message("Недостаточно денег.");
+    }
+    return;
+  }
+
+  message("Подойди ближе к персонажу или объекту.");
+}
+
+function button(id,key){
+  const b=document.getElementById(id);
+
+  b.addEventListener("touchstart",e=>{
+    e.preventDefault();
+    keys[key]=true;
+  });
+
+  b.addEventListener("touchend",e=>{
+    e.preventDefault();
+    keys[key]=false;
+  });
+
+  b.addEventListener("mousedown",()=>{
+    keys[key]=true;
+  });
+
+  b.addEventListener("mouseup",()=>{
+    keys[key]=false;
+  });
+
+  b.addEventListener("mouseleave",()=>{
+    keys[key]=false;
+  });
+}
+
+button("up","up");
+button("down","down");
+button("left","left");
+button("right","right");
+
+document.getElementById("interact").addEventListener("click",interact);
+
+updateInterface();
+move();
+draw();
+</script>.quest=
+
+
+</body>
+</html>
+
+
+
+
+
