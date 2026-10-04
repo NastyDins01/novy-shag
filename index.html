@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Город после полуночи</title>
 
 <style>
@@ -16,9 +16,10 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #05070c;
+    background: #03050a;
     font-family: Arial, sans-serif;
     color: white;
+    touch-action: none;
 }
 
 #game {
@@ -27,75 +28,64 @@ html, body {
     height: 100vh;
     overflow: hidden;
     background:
-        radial-gradient(circle at 50% 40%, #263247 0%, #101722 35%, #05070c 75%);
+        linear-gradient(#070b14 0%, #101a29 48%, #080b10 100%);
 }
 
 /* Луна */
 
 #moon {
     position: absolute;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #d9e2e8;
-    box-shadow: 0 0 45px #aabed0;
-    top: 8%;
+    width: 75px;
+    height: 75px;
     right: 12%;
-}
-
-/* Туман */
-
-.fog {
-    position: absolute;
-    width: 160%;
-    height: 35%;
-    left: -30%;
-    bottom: 8%;
-    background: rgba(180, 195, 205, 0.08);
-    filter: blur(25px);
-    animation: fog 12s linear infinite alternate;
-}
-
-@keyframes fog {
-    from { transform: translateX(-8%); }
-    to { transform: translateX(8%); }
+    top: 9%;
+    border-radius: 50%;
+    background: #dce7ef;
+    box-shadow: 0 0 40px #9eb9ce;
 }
 
 /* Дорога */
 
 #road {
     position: absolute;
-    left: 35%;
+    left: 25%;
     bottom: 0;
-    width: 30%;
-    height: 75%;
-    background: #11151c;
-    clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+    width: 50%;
+    height: 82%;
+    background: #151922;
+    clip-path: polygon(42% 0,58% 0,100% 100%,0 100%);
 }
 
-/* Здания */
+/* Тротуары */
+
+.side {
+    position: absolute;
+    bottom: 0;
+    width: 30%;
+    height: 65%;
+    background: #10141a;
+}
+
+#leftSide {
+    left: 0;
+    clip-path: polygon(0 25%,100% 0,100% 100%,0 100%);
+}
+
+#rightSide {
+    right: 0;
+    clip-path: polygon(0 0,100% 25%,100% 100%,0 100%);
+}
+
+/* Дома */
 
 .building {
     position: absolute;
-    bottom: 28%;
-    width: 24%;
-    height: 40%;
-    background: #171b22;
-    border: 3px solid #080a0e;
-    box-shadow: 0 10px 30px #000;
-}
-
-.building::before {
-    content: "";
-    position: absolute;
-    inset: 12px;
-    background:
-        repeating-linear-gradient(
-            to right,
-            #222a32 0 18px,
-            #080b10 18px 30px
-        );
-    opacity: .8;
+    bottom: 34%;
+    width: 25%;
+    height: 32%;
+    background: #191d25;
+    border: 3px solid #07090d;
+    box-shadow: 0 12px 35px #000;
 }
 
 #house {
@@ -106,943 +96,343 @@ html, body {
     right: 4%;
 }
 
-#school {
-    left: 38%;
-    bottom: 50%;
-    width: 24%;
-    height: 22%;
-    background: #20252d;
+.building .roof {
+    position: absolute;
+    top: -18px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: 25px;
+    background: #0c0e13;
+    transform: skewX(-25deg);
 }
 
-/* Названия */
+.window {
+    position: absolute;
+    width: 25px;
+    height: 35px;
+    background: #202731;
+    border: 3px solid #080a0e;
+}
+
+.window.on {
+    background: #b39b5b;
+    box-shadow: 0 0 15px #b39b5b;
+}
+
+#house .w1 {
+    left: 20%;
+    top: 30%;
+}
+
+#house .w2 {
+    right: 20%;
+    top: 30%;
+}
+
+#house .w3 {
+    left: 42%;
+    bottom: 12%;
+}
+
+#shop .w1 {
+    left: 18%;
+    top: 28%;
+}
+
+#shop .w2 {
+    right: 18%;
+    top: 28%;
+}
+
+/* Школа */
+
+#school {
+    position: absolute;
+    left: 37%;
+    top: 20%;
+    width: 26%;
+    height: 20%;
+    background: #20242c;
+    border: 3px solid #090b10;
+    box-shadow: 0 8px 25px #000;
+}
+
+#schoolLight {
+    position: absolute;
+    width: 22px;
+    height: 28px;
+    left: 47%;
+    top: 30%;
+    background: #d7bd69;
+    box-shadow: 0 0 20px #d7bd69;
+}
+
+/* Надписи */
 
 .sign {
     position: absolute;
-    z-index: 3;
-    top: 8px;
     left: 50%;
+    top: 7px;
     transform: translateX(-50%);
-    white-space: nowrap;
-    color: #aebbc5;
-    font-size: 12px;
+    font-size: 10px;
     letter-spacing: 2px;
+    color: #9ca7b1;
+}
+
+/* Туман */
+
+.fog {
+    position: absolute;
+    left: -20%;
+    bottom: 15%;
+    width: 140%;
+    height: 25%;
+    background: rgba(190,205,215,.08);
+    filter: blur(25px);
+    animation: fogMove 10s infinite alternate;
+}
+
+@keyframes fogMove {
+    from { transform: translateX(-4%); }
+    to { transform: translateX(4%); }
 }
 
 /* Игрок */
 
 #player {
     position: absolute;
-    width: 28px;
-    height: 48px;
-    left: 50%;
-    top: 68%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
+    z-index: 20;
+    width: 30px;
+    height: 52px;
+    transform: translate(-50%,-50%);
 }
 
 #head {
     position: absolute;
+    left: 6px;
+    top: 0;
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #c99370;
-    left: 5px;
-    top: 0;
+    background: #c98e69;
 }
 
 #body {
     position: absolute;
-    width: 20px;
-    height: 28px;
-    border-radius: 7px 7px 3px 3px;
-    background: #293849;
     left: 4px;
     top: 17px;
+    width: 22px;
+    height: 27px;
+    border-radius: 6px;
+    background: #314052;
 }
 
-#legs {
+#leg1, #leg2 {
     position: absolute;
-    width: 7px;
-    height: 17px;
-    background: #111722;
-    left: 5px;
     top: 42px;
-    box-shadow: 11px 0 #111722;
+    width: 7px;
+    height: 15px;
+    background: #111722;
+}
+
+#leg1 {
+    left: 5px;
+}
+
+#leg2 {
+    left: 18px;
 }
 
 /* Фонарик */
 
-#flashlight {
+#light {
     position: absolute;
+    z-index: 10;
     pointer-events: none;
-    z-index: 8;
-    left: 50%;
-    top: 63%;
-    width: 230px;
-    height: 230px;
-    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%,-50%);
     border-radius: 50%;
     background: radial-gradient(
         circle,
-        rgba(255,255,220,.24) 0%,
-        rgba(255,255,220,.10) 25%,
-        rgba(255,255,220,.02) 55%,
+        rgba(255,245,190,.25) 0%,
+        rgba(255,245,190,.12) 25%,
+        rgba(255,245,190,.03) 55%,
         transparent 70%
     );
 }
 
-/* Верхний интерфейс */
+/* Интерфейс */
 
 #title {
     position: absolute;
-    z-index: 20;
-    top: 18px;
+    z-index: 50;
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
+    width: 100%;
     text-align: center;
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: 3px;
-    text-shadow: 0 0 10px black;
+    text-shadow: 0 2px 8px #000;
 }
 
 #message {
     position: absolute;
-    z-index: 20;
-    top: 55px;
-    left: 50%;
-    transform: translateX(-50%);
+    z-index: 50;
+    top: 48px;
+    left: 5%;
     width: 90%;
     text-align: center;
-    color: #aeb8c1;
-    font-size: 13px;
+    font-size: 14px;
+    color: #c1cad2;
+}
+
+/* Кнопка взаимодействия */
+
+#action {
+    display: none;
+    position: absolute;
+    z-index: 80;
+    left: 50%;
+    bottom: 135px;
+    transform: translateX(-50%);
+    border: 0;
+    border-radius: 14px;
+    padding: 15px 30px;
+    background: #d2b263;
+    color: #15120b;
+    font-size: 17px;
+    font-weight: bold;
+    box-shadow: 0 0 25px rgba(210,178,99,.4);
 }
 
 /* Джойстик */
 
 #joystick {
     position: absolute;
-    z-index: 30;
-    bottom: 25px;
-    left: 25px;
+    z-index: 70;
+    left: 20px;
+    bottom: 20px;
     width: 125px;
     height: 125px;
     border-radius: 50%;
-    background: rgba(255,255,255,.08);
     border: 2px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.07);
 }
 
 #stick {
     position: absolute;
-    width: 55px;
-    height: 55px;
     left: 33px;
     top: 33px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     background: rgba(220,230,240,.35);
-    border: 2px solid rgba(255,255,255,.25);
 }
 
-/* Кнопка фонарика */
+/* Фонарик */
 
-#lightButton {
+#flashButton {
     position: absolute;
-    z-index: 30;
-    bottom: 35px;
+    z-index: 70;
     right: 25px;
+    bottom: 38px;
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,.25);
+    border: 2px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.1);
     color: white;
-    font-size: 28px;
-}
-
-/* Ночь */
-
-.dark #flashlight {
-    opacity: .15;
-}
-
-#blackout {
-    position: absolute;
-    z-index: 15;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(
-        circle at 50% 65%,
-        transparent 0 15%,
-        rgba(0,0,0,.45) 45%,
-        rgba(0,0,0,.85) 100%
-    );
-}
-</style>
-</head>
-
-<body>
-
-<div id="game">
-
-    <div id="moon"></div>
-
-    <div id="title">ГОРОД ПОСЛЕ ПОЛУНОЧИ</div>
-
-    <div id="message">
-        Ты проснулся на пустой улице... Здесь слишком тихо.
-    </div>
-
-    <div id="road"></div>
-
-    <div id="house" class="building">
-        <div class="sign">ДОМ</div>
-    </div>
-
-    <div id="shop" class="building">
-        <div class="sign">МАГАЗИН</div>
-    </div>
-
-    <div id="school" class="building">
-        <div class="sign">ШКОЛА</div>
-    </div>
-
-    <div class="fog"></div>
-
-    <div id="flashlight"></div>
-
-    <div id="blackout"></div>
-
-    <div id="player">
-        <div id="head"></div>
-        <div id="body"></div>
-        <div id="legs"></div>
-    </div>
-
-    <div id="joystick">
-        <div id="stick"></div>
-    </div>
-
-    <button id="lightButton">🔦</button>
-
-</div>
-
-<script>
-
-const player = document.getElementById("player");
-const stick = document.getElementById("stick");
-const joystick = document.getElementById("joystick");
-const flashlight = document.getElementById("flashlight");
-const message = document.getElementById("message");
-const lightButton = document.getElementById("lightButton");
-
-let x = window.innerWidth / 2;
-let y = window.innerHeight * 0.68;
-
-let moving = false;
-let lightOn = true;
-
-let joyX = 0;
-let joyY = 0;
-
-function updatePlayer() {
-
-    x += joyX * 3;
-    y += joyY * 3;
-
-    x = Math.max(20, Math.min(window.innerWidth - 20, x));
-    y = Math.max(120, Math.min(window.innerHeight - 80, y));
-
-    player.style.left = x + "px";
-    player.style.top = y + "px";
-
-    flashlight.style.left = x + "px";
-    flashlight.style.top = (y - 35) + "px";
-
-    checkPlace();
-}
-
-function checkPlace() {
-
-    if (x < window.innerWidth * .3 && y < window.innerHeight * .7) {
-        message.textContent = "Старый дом... Внутри что-то блеснуло.";
-    }
-    else if (x > window.innerWidth * .7 && y < window.innerHeight * .7) {
-        message.textContent = "Заброшенный магазин. Дверь заперта.";
-    }
-    else if (
-        x > window.innerWidth * .38 &&
-        x < window.innerWidth * .62 &&
-        y < window.innerHeight * .55
-    ) {
-        message.textContent = "Старая школа. На втором этаже горит свет.";
-    }
-    else {
-        message.textContent = "Ты один посреди пустого города...";
-    }
-}
-
-/* Джойстик */
-
-function moveStick(clientX, clientY) {
-
-    const rect = joystick.getBoundingClientRect();
-
-    let dx = clientX - (rect.left + rect.width / 2);
-    let dy = clientY - (rect.top + rect.height / 2);
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const max = 38;
-
-    if (distance > max) {
-        dx = dx / distance * max;
-        dy = dy / distance * max;
-    }
-
-    stick.style.transform =
-        `translate(${dx}px, ${dy}px)`;
-
-    joyX = dx / max;
-    joyY = dy / max;
-}
-
-joystick.addEventListener("touchstart", e => {
-    moving = true;
-    moveStick(
-        e.touches[0].clientX,
-        e.touches[0].clientY
-    );
-});
-
-joystick.addEventListener("touchmove", e => {
-
-    if (!moving) return;
-
-    moveStick(
-        e.touches[0].clientX,
-        e.touches[0].clientY
-    );
-
-    e.preventDefault();
-
-}, { passive: false });
-
-joystick.addEventListener("touchend", () => {
-
-    moving = false;
-
-    stick.style.transform = "translate(0,0)";
-
-    joyX = 0;
-    joyY = 0;
-});
-
-/* Фонарик */
-
-lightButton.addEventListener("click", () => {
-
-    lightOn = !lightOn;
-
-    flashlight.style.opacity = lightOn ? "1" : "0";
-
-    lightButton.textContent =
-        lightOn ? "🔦" : "🌑";
-});
-
-/* Клавиатура для компьютера */
-
-const keys = {};
-
-document.addEventListener("keydown", e => {
-    keys[e.key.toLowerCase()] = true;
-});
-
-document.addEventListener("keyup", e => {
-    keys[e.key.toLowerCase()] = false;
-});
-
-function keyboardControl() {
-
-    joyX = 0;
-    joyY = 0;
-
-    if (keys["a"] || keys["arrowleft"]) joyX = -1;
-    if (keys["d"] || keys["arrowright"]) joyX = 1;
-    if (keys["w"] || keys["arrowup"]) joyY = -1;
-    if (keys["s"] || keys["arrowdown"]) joyY = 1;
-}
-
-/* Игровой цикл */
-
-function gameLoop() {
-
-    if (!moving) {
-        keyboardControl();
-    }
-
-    updatePlayer();
-
-    requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
-
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Город после полуночи</title>
-
-<style>
-
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #05070c;
-    font-family: Arial, sans-serif;
-    color: white;
-}
-
-#game {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-
-    background:
-        radial-gradient(
-            circle at 50% 40%,
-            #263247 0%,
-            #101722 35%,
-            #05070c 75%
-        );
-}
-
-/* Луна */
-
-#moon {
-    position: absolute;
-
-    width: 90px;
-    height: 90px;
-
-    border-radius: 50%;
-
-    background: #d9e2e8;
-
-    box-shadow:
-        0 0 45px #aabed0;
-
-    top: 8%;
-    right: 12%;
-}
-
-/* Туман */
-
-.fog {
-    position: absolute;
-
-    width: 160%;
-    height: 35%;
-
-    left: -30%;
-    bottom: 8%;
-
-    background: rgba(180,195,205,.08);
-
-    filter: blur(25px);
-
-    animation: fog 12s linear infinite alternate;
-}
-
-@keyframes fog {
-
-    from {
-        transform: translateX(-8%);
-    }
-
-    to {
-        transform: translateX(8%);
-    }
-
-}
-
-/* Дорога */
-
-#road {
-
-    position: absolute;
-
-    left: 35%;
-    bottom: 0;
-
-    width: 30%;
-    height: 75%;
-
-    background: #11151c;
-
-    clip-path:
-        polygon(
-            42% 0,
-            58% 0,
-            100% 100%,
-            0 100%
-        );
-}
-
-/* Здания */
-
-.building {
-
-    position: absolute;
-
-    bottom: 28%;
-
-    width: 24%;
-    height: 40%;
-
-    background: #171b22;
-
-    border: 3px solid #080a0e;
-
-    box-shadow:
-        0 10px 30px #000;
-}
-
-.building::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 12px;
-
-    background:
-        repeating-linear-gradient(
-            to right,
-            #222a32 0 18px,
-            #080b10 18px 30px
-        );
-
-    opacity: .8;
-}
-
-#house {
-    left: 4%;
-}
-
-#shop {
-    right: 4%;
-}
-
-#school {
-
-    left: 38%;
-
-    bottom: 50%;
-
-    width: 24%;
-    height: 22%;
-
-    background: #20252d;
-}
-
-/* Названия */
-
-.sign {
-
-    position: absolute;
-
-    z-index: 3;
-
-    top: 8px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    white-space: nowrap;
-
-    color: #aebbc5;
-
-    font-size: 12px;
-
-    letter-spacing: 2px;
-}
-
-/* Игрок */
-
-#player {
-
-    position: absolute;
-
-    width: 28px;
-    height: 48px;
-
-    left: 50%;
-    top: 68%;
-
-    transform:
-        translate(-50%, -50%);
-
-    z-index: 10;
-}
-
-#head {
-
-    position: absolute;
-
-    width: 18px;
-    height: 18px;
-
-    border-radius: 50%;
-
-    background: #c99370;
-
-    left: 5px;
-    top: 0;
-}
-
-#body {
-
-    position: absolute;
-
-    width: 20px;
-    height: 28px;
-
-    border-radius:
-        7px 7px 3px 3px;
-
-    background: #293849;
-
-    left: 4px;
-    top: 17px;
-}
-
-#legs {
-
-    position: absolute;
-
-    width: 7px;
-    height: 17px;
-
-    background: #111722;
-
-    left: 5px;
-    top: 42px;
-
-    box-shadow:
-        11px 0 #111722;
-}
-
-/* Фонарик */
-
-#flashlight {
-
-    position: absolute;
-
-    pointer-events: none;
-
-    z-index: 8;
-
-    left: 50%;
-    top: 63%;
-
-    width: 230px;
-    height: 230px;
-
-    transform:
-        translate(-50%, -50%);
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,255,220,.24) 0%,
-            rgba(255,255,220,.10) 25%,
-            rgba(255,255,220,.02) 55%,
-            transparent 70%
-        );
-}
-
-/* Верх */
-
-#title {
-
-    position: absolute;
-
-    z-index: 20;
-
-    top: 18px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    text-align: center;
-
-    font-size: 18px;
-
-    letter-spacing: 3px;
-
-    text-shadow:
-        0 0 10px black;
-}
-
-#message {
-
-    position: absolute;
-
-    z-index: 20;
-
-    top: 55px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    width: 90%;
-
-    text-align: center;
-
-    color: #aeb8c1;
-
-    font-size: 13px;
-}
-
-/* Джойстик */
-
-#joystick {
-
-    position: absolute;
-
-    z-index: 30;
-
-    bottom: 25px;
-    left: 25px;
-
-    width: 125px;
-    height: 125px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255,255,255,.08);
-
-    border:
-        2px solid rgba(255,255,255,.15);
-}
-
-#stick {
-
-    position: absolute;
-
-    width: 55px;
-    height: 55px;
-
-    left: 33px;
-    top: 33px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(220,230,240,.35);
-
-    border:
-        2px solid rgba(255,255,255,.25);
-}
-
-/* Кнопка */
-
-#lightButton {
-
-    position: absolute;
-
-    z-index: 30;
-
-    bottom: 35px;
-    right: 25px;
-
-    width: 70px;
-    height: 70px;
-
-    border-radius: 50%;
-
-    border:
-        2px solid rgba(255,255,255,.25);
-
-    background:
-        rgba(255,255,255,.1);
-
-    color: white;
-
-    font-size: 28px;
-}
-
-/* Кнопка входа */
-
-#enterButton {
-
-    display: none;
-
-    position: absolute;
-
-    z-index: 40;
-
-    left: 50%;
-    bottom: 130px;
-
-    transform:
-        translateX(-50%);
-
-    padding: 15px 30px;
-
-    border: none;
-
-    border-radius: 12px;
-
-    background: #d6b36a;
-
-    color: #17120b;
-
-    font-size: 17px;
-
-    font-weight: bold;
-
-    box-shadow:
-        0 0 25px rgba(214,179,106,.35);
+    font-size: 27px;
 }
 
 /* Интерьер */
 
-#houseInterior {
-
+#inside {
     display: none;
-
     position: absolute;
-
+    z-index: 200;
     inset: 0;
-
-    z-index: 100;
-
     background:
-        radial-gradient(
-            circle at 50% 45%,
-            #3b3029,
-            #15110f 60%,
-            #050403
-        );
+        radial-gradient(circle at 50% 42%,
+        #41362c 0%,
+        #1b1511 45%,
+        #050403 100%);
 }
 
-#interiorText {
-
-    position: absolute;
-
-    top: 25px;
-
-    width: 100%;
-
+#inside h2 {
+    margin: 25px 0 0;
     text-align: center;
-
-    font-size: 20px;
-
-    letter-spacing: 2px;
+    letter-spacing: 3px;
 }
 
-#item {
-
+#door {
     position: absolute;
-
     left: 50%;
-    top: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 190px;
+    background: #17100d;
+    border: 6px solid #080605;
+}
 
-    transform:
-        translate(-50%, -50%);
+#table {
+    position: absolute;
+    left: 20%;
+    bottom: 28%;
+    width: 60%;
+    height: 18px;
+    background: #241811;
+}
 
-    font-size: 60px;
-
-    filter:
-        drop-shadow(
-            0 0 15px #ffd76a
-        );
-
+#key {
+    position: absolute;
+    z-index: 210;
+    left: 50%;
+    top: 52%;
+    transform: translate(-50%,-50%);
+    font-size: 65px;
     cursor: pointer;
+    filter: drop-shadow(0 0 15px #ffd85e);
 }
 
-#itemText {
-
+#insideText {
     position: absolute;
-
-    left: 50%;
-    top: 60%;
-
-    transform:
-        translateX(-50%);
-
-    width: 90%;
-
+    left: 10%;
+    width: 80%;
+    top: 64%;
     text-align: center;
-
-    color: #ddd;
-
+    color: #d1d1d1;
     font-size: 14px;
 }
 
-#exitButton {
-
+#exit {
     position: absolute;
-
     left: 50%;
-    bottom: 40px;
-
-    transform:
-        translateX(-50%);
-
+    bottom: 35px;
+    transform: translateX(-50%);
     padding: 14px 35px;
-
-    border: none;
-
+    border: 0;
     border-radius: 12px;
-
-    background: #333;
-
+    background: #363636;
     color: white;
-
     font-size: 16px;
 }
 
-/* Затемнение */
+/* Инвентарь */
 
-#blackout {
-
+#inventory {
     position: absolute;
-
-    z-index: 15;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            circle at 50% 65%,
-            transparent 0 15%,
-            rgba(0,0,0,.45) 45%,
-            rgba(0,0,0,.85) 100%
-        );
+    z-index: 90;
+    right: 15px;
+    top: 15px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.5);
+    font-size: 14px;
 }
-
 </style>
 </head>
 
@@ -1057,392 +447,338 @@ html, body {
     </div>
 
     <div id="message">
-        Ты проснулся на пустой улице...
-        Здесь слишком тихо.
+        Ты проснулся посреди пустого города...
+    </div>
+
+    <div id="inventory">
+        🎒 Пусто
     </div>
 
     <div id="road"></div>
 
+    <div id="leftSide" class="side"></div>
+    <div id="rightSide" class="side"></div>
+
     <div id="house" class="building">
+
+        <div class="roof"></div>
+
         <div class="sign">ДОМ</div>
+
+        <div class="window w1"></div>
+        <div class="window w2"></div>
+        <div class="window w3"></div>
+
     </div>
 
     <div id="shop" class="building">
+
+        <div class="roof"></div>
+
         <div class="sign">МАГАЗИН</div>
+
+        <div class="window w1"></div>
+        <div class="window w2"></div>
+
     </div>
 
-    <div id="school" class="building">
-        <div class="sign">ШКОЛА</div>
+    <div id="school">
+
+        <div class="sign">
+            ШКОЛА
+        </div>
+
+        <div id="schoolLight"></div>
+
     </div>
 
     <div class="fog"></div>
 
-    <div id="flashlight"></div>
-
-    <div id="blackout"></div>
+    <div id="light"></div>
 
     <div id="player">
 
         <div id="head"></div>
-
         <div id="body"></div>
-
-        <div id="legs"></div>
+        <div id="leg1"></div>
+        <div id="leg2"></div>
 
     </div>
+
+    <button id="action">
+        🚪 ВОЙТИ В ДОМ
+    </button>
 
     <div id="joystick">
-
         <div id="stick"></div>
-
     </div>
 
-    <button id="lightButton">
+    <button id="flashButton">
         🔦
     </button>
 
-    <button id="enterButton">
-        🚪 Войти в дом
-    </button>
 
-    <!-- Дом -->
+    <!-- ДОМ -->
 
-    <div id="houseInterior">
+    <div id="inside">
 
-        <div id="interiorText">
+        <h2>
             СТАРЫЙ ДОМ
-        </div>
+        </h2>
 
-        <div id="item">
+        <div id="door"></div>
+
+        <div id="table"></div>
+
+        <div id="key">
             🔑
         </div>
 
-        <div id="itemText">
-            На полу лежит старый ключ.
-            <br>
-            Нажми на него, чтобы подобрать.
+        <div id="insideText">
+            На столе лежит старый ключ.
+            <br><br>
+            Нажми на ключ, чтобы подобрать его.
         </div>
 
-        <button id="exitButton">
-            ↩ Выйти
+        <button id="exit">
+            ↩ ВЫЙТИ
         </button>
 
     </div>
 
 </div>
 
+
 <script>
 
-const player =
-    document.getElementById("player");
+/* =========================
+   СОСТОЯНИЕ ИГРЫ
+========================= */
 
-const stick =
-    document.getElementById("stick");
+let playerX = window.innerWidth / 2;
+let playerY = window.innerHeight * .72;
 
-const joystick =
-    document.getElementById("joystick");
+let moveX = 0;
+let moveY = 0;
 
-const flashlight =
-    document.getElementById("flashlight");
+let joystickActive = false;
 
-const message =
-    document.getElementById("message");
+let flashlightOn = true;
 
-const lightButton =
-    document.getElementById("lightButton");
-
-const enterButton =
-    document.getElementById("enterButton");
-
-const houseInterior =
-    document.getElementById("houseInterior");
-
-const exitButton =
-    document.getElementById("exitButton");
-
-const item =
-    document.getElementById("item");
-
-let x =
-    window.innerWidth / 2;
-
-let y =
-    window.innerHeight * .68;
-
-let joyX = 0;
-let joyY = 0;
-
-let moving = false;
-
-let lightOn = true;
+let insideHouse = false;
 
 let hasKey = false;
 
 
-/* Обновление игрока */
+/* =========================
+   ЭЛЕМЕНТЫ
+========================= */
 
-function updatePlayer() {
+const player =
+    document.getElementById("player");
 
-    x += joyX * 3;
+const light =
+    document.getElementById("light");
 
-    y += joyY * 3;
+const message =
+    document.getElementById("message");
 
-    x =
+const action =
+    document.getElementById("action");
+
+const inside =
+    document.getElementById("inside");
+
+const key =
+    document.getElementById("key");
+
+const exit =
+    document.getElementById("exit");
+
+const inventory =
+    document.getElementById("inventory");
+
+const joystick =
+    document.getElementById("joystick");
+
+const stick =
+    document.getElementById("stick");
+
+const flashButton =
+    document.getElementById("flashButton");
+
+
+/* =========================
+   ИГРОК
+========================= */
+
+function drawPlayer() {
+
+    player.style.left =
+        playerX + "px";
+
+    player.style.top =
+        playerY + "px";
+
+    light.style.left =
+        playerX + "px";
+
+    light.style.top =
+        (playerY - 20) + "px";
+}
+
+
+/* =========================
+   ПРОВЕРКА ДОМА
+========================= */
+
+function checkHouse() {
+
+    /*
+       Дом находится слева.
+       Зона входа специально большая,
+       чтобы на телефоне было легко.
+    */
+
+    const nearHouse =
+        playerX < window.innerWidth * .48 &&
+        playerY > window.innerHeight * .30 &&
+        playerY < window.innerHeight * .90;
+
+
+    if (nearHouse && !insideHouse) {
+
+        action.style.display =
+            "block";
+
+        message.textContent =
+            "Старый дом. Дверь почему-то открыта.";
+
+        return;
+    }
+
+
+    action.style.display =
+        "none";
+
+
+    if (!insideHouse) {
+
+        message.textContent =
+            "Ты один посреди пустого города...";
+
+    }
+}
+
+
+/* =========================
+   ДВИЖЕНИЕ
+========================= */
+
+function updateMovement() {
+
+    if (insideHouse)
+        return;
+
+    playerX += moveX * 4;
+    playerY += moveY * 4;
+
+    /*
+       Границы экрана
+    */
+
+    playerX =
         Math.max(
             20,
             Math.min(
                 window.innerWidth - 20,
-                x
+                playerX
             )
         );
 
-    y =
+    playerY =
         Math.max(
-            120,
+            110,
             Math.min(
-                window.innerHeight - 80,
-                y
+                window.innerHeight - 90,
+                playerY
             )
         );
 
-    player.style.left =
-        x + "px";
+    drawPlayer();
 
-    player.style.top =
-        y + "px";
-
-    flashlight.style.left =
-        x + "px";
-
-    flashlight.style.top =
-        (y - 35) + "px";
-
-    checkPlace();
+    checkHouse();
 }
 
 
-/* Проверяем положение */
+/* =========================
+   ДЖОЙСТИК
+========================= */
 
-function checkPlace() {
-
-    /*
-       Левая часть города —
-       старый дом
-    */
-
-    if (
-        x <
-        window.innerWidth * .30 &&
-        y <
-        window.innerHeight * .72
-    ) {
-
-        message.textContent =
-            "Старый дом... Кажется, дверь открыта.";
-
-        enterButton.style.display =
-            "block";
-
-        return;
-    }
-
-    enterButton.style.display =
-        "none";
-
-    /*
-       Магазин
-    */
-
-    if (
-        x >
-        window.innerWidth * .70 &&
-        y <
-        window.innerHeight * .72
-    ) {
-
-        message.textContent =
-            "Заброшенный магазин. Дверь заперта.";
-
-        return;
-    }
-
-    /*
-       Школа
-    */
-
-    if (
-        x >
-        window.innerWidth * .38 &&
-        x <
-        window.innerWidth * .62 &&
-        y <
-        window.innerHeight * .55
-    ) {
-
-        message.textContent =
-            "Старая школа. На втором этаже горит свет.";
-
-        return;
-    }
-
-    message.textContent =
-        "Ты один посреди пустого города...";
-}
-
-
-/* Вход */
-
-enterButton.addEventListener(
-    "click",
-    () => {
-
-        houseInterior.style.display =
-            "block";
-
-        enterButton.style.display =
-            "none";
-
-        message.style.display =
-            "none";
-
-    }
-);
-
-
-/* Выход */
-
-exitButton.addEventListener(
-    "click",
-    () => {
-
-        houseInterior.style.display =
-            "none";
-
-        message.style.display =
-            "block";
-
-        message.textContent =
-            "Ты снова на улице.";
-
-    }
-);
-
-
-/* Подобрать ключ */
-
-item.addEventListener(
-    "click",
-    () => {
-
-        hasKey = true;
-
-        item.style.display =
-            "none";
-
-        document.getElementById(
-            "itemText"
-        ).innerHTML =
-            "Ты нашёл старый ключ.<br><br>🔑 Ключ получен!";
-
-    }
-);
-
-
-/* Фонарик */
-
-lightButton.addEventListener(
-    "click",
-    () => {
-
-        lightOn =
-            !lightOn;
-
-        flashlight.style.opacity =
-            lightOn ? "1" : "0";
-
-        lightButton.textContent =
-            lightOn ? "🔦" : "🌑";
-
-    }
-);
-
-
-/* Джойстик */
-
-function moveStick(
-    clientX,
-    clientY
-) {
+function joystickMove(x, y) {
 
     const rect =
         joystick.getBoundingClientRect();
 
     let dx =
-        clientX -
-        (
-            rect.left +
-            rect.width / 2
-        );
+        x -
+        (rect.left + rect.width / 2);
 
     let dy =
-        clientY -
-        (
-            rect.top +
-            rect.height / 2
-        );
+        y -
+        (rect.top + rect.height / 2);
 
     const distance =
-        Math.sqrt(
-            dx * dx +
-            dy * dy
-        );
+        Math.sqrt(dx * dx + dy * dy);
 
-    const max = 38;
+    const maxDistance = 38;
 
-    if (distance > max) {
+    if (distance > maxDistance) {
 
         dx =
-            dx / distance * max;
+            dx / distance *
+            maxDistance;
 
         dy =
-            dy / distance * max;
-
+            dy / distance *
+            maxDistance;
     }
 
     stick.style.transform =
-        `translate(${dx}px, ${dy}px)`;
+        `translate(${dx}px,${dy}px)`;
 
-    joyX =
-        dx / max;
+    moveX =
+        dx / maxDistance;
 
-    joyY =
-        dy / max;
+    moveY =
+        dy / maxDistance;
 }
 
 
 joystick.addEventListener(
     "touchstart",
-    e => {
+    function(e) {
 
-        moving = true;
+        joystickActive = true;
 
-        moveStick(
+        joystickMove(
             e.touches[0].clientX,
             e.touches[0].clientY
         );
 
-    }
+    },
+    {passive:false}
 );
 
 
 joystick.addEventListener(
     "touchmove",
-    e => {
+    function(e) {
 
-        if (!moving)
+        if (!joystickActive)
             return;
 
-        moveStick(
+        joystickMove(
             e.touches[0].clientX,
             e.touches[0].clientY
         );
@@ -1450,35 +786,34 @@ joystick.addEventListener(
         e.preventDefault();
 
     },
-    {
-        passive: false
-    }
+    {passive:false}
 );
 
 
 joystick.addEventListener(
     "touchend",
-    () => {
+    function() {
 
-        moving = false;
+        joystickActive = false;
+
+        moveX = 0;
+        moveY = 0;
 
         stick.style.transform =
             "translate(0,0)";
-
-        joyX = 0;
-        joyY = 0;
-
     }
 );
 
 
-/* Клавиатура */
+/* =========================
+   КЛАВИАТУРА
+========================= */
 
 const keys = {};
 
 document.addEventListener(
     "keydown",
-    e => {
+    function(e) {
 
         keys[
             e.key.toLowerCase()
@@ -1490,7 +825,7 @@ document.addEventListener(
 
 document.addEventListener(
     "keyup",
-    e => {
+    function(e) {
 
         keys[
             e.key.toLowerCase()
@@ -1500,52 +835,158 @@ document.addEventListener(
 );
 
 
-function keyboardControl() {
+function keyboardMovement() {
 
-    if (moving)
+    if (joystickActive)
         return;
 
-    joyX = 0;
-    joyY = 0;
-
-    if (
-        keys["a"] ||
-        keys["arrowleft"]
-    )
-        joyX = -1;
-
-    if (
-        keys["d"] ||
-        keys["arrowright"]
-    )
-        joyX = 1;
+    moveX = 0;
+    moveY = 0;
 
     if (
         keys["w"] ||
         keys["arrowup"]
     )
-        joyY = -1;
+        moveY = -1;
 
     if (
         keys["s"] ||
         keys["arrowdown"]
     )
-        joyY = 1;
+        moveY = 1;
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    )
+        moveX = -1;
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    )
+        moveX = 1;
 }
 
 
-/* Игровой цикл */
+/* =========================
+   ВХОД В ДОМ
+========================= */
+
+action.addEventListener(
+    "click",
+    function() {
+
+        insideHouse = true;
+
+        action.style.display =
+            "none";
+
+        inside.style.display =
+            "block";
+
+        message.textContent =
+            "";
+
+    }
+);
+
+
+/* =========================
+   КЛЮЧ
+========================= */
+
+key.addEventListener(
+    "click",
+    function() {
+
+        if (hasKey)
+            return;
+
+        hasKey = true;
+
+        key.style.display =
+            "none";
+
+        inventory.innerHTML =
+            "🎒 🔑 Ключ";
+
+        document.getElementById(
+            "insideText"
+        ).innerHTML =
+            "Ты нашёл старый ключ.<br><br>" +
+            "🔑 КЛЮЧ ПОЛУЧЕН!";
+
+    }
+);
+
+
+/* =========================
+   ВЫХОД
+========================= */
+
+exit.addEventListener(
+    "click",
+    function() {
+
+        insideHouse = false;
+
+        inside.style.display =
+            "none";
+
+        message.textContent =
+            "Ты снова на улице.";
+
+        checkHouse();
+
+    }
+);
+
+
+/* =========================
+   ФОНАРИК
+========================= */
+
+flashButton.addEventListener(
+    "click",
+    function() {
+
+        flashlightOn =
+            !flashlightOn;
+
+        light.style.opacity =
+            flashlightOn ? "1" : "0";
+
+        flashButton.textContent =
+            flashlightOn
+                ? "🔦"
+                : "🌑";
+
+    }
+);
+
+
+/* =========================
+   ИГРОВОЙ ЦИКЛ
+========================= */
 
 function gameLoop() {
 
-    keyboardControl();
+    keyboardMovement();
 
-    updatePlayer();
+    updateMovement();
 
     requestAnimationFrame(
         gameLoop
     );
 }
+
+
+/* =========================
+   СТАРТ
+========================= */
+
+drawPlayer();
 
 gameLoop();
 
