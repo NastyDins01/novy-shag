@@ -2,2524 +2,1550 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Новый Шаг — City 2.9D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Город после полуночи</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-    user-select:none;
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#17201e;
-    font-family:Arial,sans-serif;
-    touch-action:none;
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05070c;
+    font-family: Arial, sans-serif;
+    color: white;
 }
 
-#game{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 40%, #263247 0%, #101722 35%, #05070c 75%);
 }
 
-#hud{
-    position:fixed;
-    z-index:20;
-    top:12px;
-    left:12px;
-    right:12px;
-    display:flex;
-    justify-content:space-between;
-    pointer-events:none;
+/* Луна */
+
+#moon {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #d9e2e8;
+    box-shadow: 0 0 45px #aabed0;
+    top: 8%;
+    right: 12%;
 }
 
-.panel{
-    color:white;
-    background:rgba(12,17,18,.78);
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:15px;
-    padding:9px 12px;
-    backdrop-filter:blur(8px);
-    box-shadow:0 7px 25px rgba(0,0,0,.35);
+/* Туман */
+
+.fog {
+    position: absolute;
+    width: 160%;
+    height: 35%;
+    left: -30%;
+    bottom: 8%;
+    background: rgba(180, 195, 205, 0.08);
+    filter: blur(25px);
+    animation: fog 12s linear infinite alternate;
 }
 
-#playerName{
-    font-weight:bold;
-    font-size:14px;
+@keyframes fog {
+    from { transform: translateX(-8%); }
+    to { transform: translateX(8%); }
 }
 
-#level{
-    font-size:11px;
-    opacity:.75;
-    margin-top:3px;
+/* Дорога */
+
+#road {
+    position: absolute;
+    left: 35%;
+    bottom: 0;
+    width: 30%;
+    height: 75%;
+    background: #11151c;
+    clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
 }
 
-#xp{
-    width:130px;
-    height:5px;
-    background:rgba(255,255,255,.16);
-    border-radius:5px;
-    margin-top:6px;
-    overflow:hidden;
+/* Здания */
+
+.building {
+    position: absolute;
+    bottom: 28%;
+    width: 24%;
+    height: 40%;
+    background: #171b22;
+    border: 3px solid #080a0e;
+    box-shadow: 0 10px 30px #000;
 }
 
-#xpBar{
-    height:100%;
-    width:0%;
-    background:#a9d8b8;
+.building::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    background:
+        repeating-linear-gradient(
+            to right,
+            #222a32 0 18px,
+            #080b10 18px 30px
+        );
+    opacity: .8;
 }
 
-#money{
-    font-size:14px;
-    font-weight:bold;
+#house {
+    left: 4%;
 }
 
-#stars{
-    margin-top:4px;
-    font-size:12px;
-    color:#ffd45b;
+#shop {
+    right: 4%;
 }
 
-#mission{
-    position:fixed;
-    z-index:20;
-    top:74px;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(430px,calc(100% - 25px));
-    color:white;
-    text-align:center;
-    background:rgba(10,15,16,.76);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:14px;
-    padding:9px 12px;
-    backdrop-filter:blur(8px);
+#school {
+    left: 38%;
+    bottom: 50%;
+    width: 24%;
+    height: 22%;
+    background: #20252d;
 }
 
-#missionTitle{
-    color:#a8d9b9;
-    font-size:9px;
-    letter-spacing:2px;
-    margin-bottom:4px;
+/* Названия */
+
+.sign {
+    position: absolute;
+    z-index: 3;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: #aebbc5;
+    font-size: 12px;
+    letter-spacing: 2px;
 }
 
-#missionText{
-    font-size:12px;
+/* Игрок */
+
+#player {
+    position: absolute;
+    width: 28px;
+    height: 48px;
+    left: 50%;
+    top: 68%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
 }
 
-#map{
-    position:fixed;
-    z-index:25;
-    right:10px;
-    bottom:15px;
-    width:115px;
-    height:85px;
-    border:2px solid rgba(255,255,255,.65);
-    border-radius:11px;
-    background:#536954;
+#head {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #c99370;
+    left: 5px;
+    top: 0;
 }
 
-#joystick{
-    position:fixed;
-    z-index:30;
-    left:12px;
-    bottom:18px;
-    width:112px;
-    height:112px;
-    border-radius:50%;
-    background:rgba(255,255,255,.09);
-    border:2px solid rgba(255,255,255,.2);
+#body {
+    position: absolute;
+    width: 20px;
+    height: 28px;
+    border-radius: 7px 7px 3px 3px;
+    background: #293849;
+    left: 4px;
+    top: 17px;
 }
 
-#stick{
-    position:absolute;
-    left:29px;
-    top:29px;
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    background:rgba(255,255,255,.75);
-    box-shadow:0 4px 18px rgba(0,0,0,.4);
+#legs {
+    position: absolute;
+    width: 7px;
+    height: 17px;
+    background: #111722;
+    left: 5px;
+    top: 42px;
+    box-shadow: 11px 0 #111722;
 }
 
-.control{
-    position:fixed;
-    z-index:30;
-    border:1px solid rgba(255,255,255,.22);
-    color:white;
-    background:rgba(10,15,16,.82);
-    border-radius:50%;
-    font-weight:bold;
+/* Фонарик */
+
+#flashlight {
+    position: absolute;
+    pointer-events: none;
+    z-index: 8;
+    left: 50%;
+    top: 63%;
+    width: 230px;
+    height: 230px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,220,.24) 0%,
+        rgba(255,255,220,.10) 25%,
+        rgba(255,255,220,.02) 55%,
+        transparent 70%
+    );
 }
 
-#run{
-    left:137px;
-    bottom:28px;
-    width:58px;
-    height:58px;
-    font-size:10px;
+/* Верхний интерфейс */
+
+#title {
+    position: absolute;
+    z-index: 20;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px black;
 }
 
-#run.active{
-    background:#577d68;
+#message {
+    position: absolute;
+    z-index: 20;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    text-align: center;
+    color: #aeb8c1;
+    font-size: 13px;
 }
 
-#action{
-    right:24px;
-    bottom:112px;
-    width:70px;
-    height:70px;
-    display:none;
-    font-size:10px;
+/* Джойстик */
+
+#joystick {
+    position: absolute;
+    z-index: 30;
+    bottom: 25px;
+    left: 25px;
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    border: 2px solid rgba(255,255,255,.15);
 }
 
-#toast{
-    position:fixed;
-    z-index:100;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    padding:13px 19px;
-    border-radius:14px;
-    background:rgba(5,8,9,.9);
-    color:white;
-    opacity:0;
-    transition:.2s;
-    pointer-events:none;
+#stick {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    left: 33px;
+    top: 33px;
+    border-radius: 50%;
+    background: rgba(220,230,240,.35);
+    border: 2px solid rgba(255,255,255,.25);
 }
 
-@media(max-width:600px){
-    #hud{
-        top:7px;
-        left:6px;
-        right:6px;
-    }
+/* Кнопка фонарика */
 
-    .panel{
-        padding:7px 9px;
-    }
+#lightButton {
+    position: absolute;
+    z-index: 30;
+    bottom: 35px;
+    right: 25px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.1);
+    color: white;
+    font-size: 28px;
+}
 
-    #playerName{
-        font-size:12px;
-    }
+/* Ночь */
 
-    #mission{
-        top:62px;
-    }
+.dark #flashlight {
+    opacity: .15;
+}
 
-    #joystick{
-        left:8px;
-        bottom:10px;
-        width:104px;
-        height:104px;
-    }
-
-    #stick{
-        left:26px;
-        top:26px;
-    }
-
-    #run{
-        left:120px;
-        bottom:17px;
-    }
-
-    #map{
-        right:7px;
-        bottom:8px;
-        width:96px;
-        height:71px;
-    }
-
-    #action{
-        right:9px;
-        bottom:90px;
-    }
+#blackout {
+    position: absolute;
+    z-index: 15;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at 50% 65%,
+        transparent 0 15%,
+        rgba(0,0,0,.45) 45%,
+        rgba(0,0,0,.85) 100%
+    );
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="game"></canvas>
+<div id="game">
 
-<div id="hud">
+    <div id="moon"></div>
 
-    <div class="panel">
-        <div id="playerName">НАСТЯ</div>
-        <div id="level">Уровень 1</div>
+    <div id="title">ГОРОД ПОСЛЕ ПОЛУНОЧИ</div>
 
-        <div id="xp">
-            <div id="xpBar"></div>
-        </div>
+    <div id="message">
+        Ты проснулся на пустой улице... Здесь слишком тихо.
     </div>
 
-    <div class="panel" style="text-align:right">
-        <div id="money">💰 100</div>
-        <div id="stars">⭐ 0</div>
+    <div id="road"></div>
+
+    <div id="house" class="building">
+        <div class="sign">ДОМ</div>
     </div>
+
+    <div id="shop" class="building">
+        <div class="sign">МАГАЗИН</div>
+    </div>
+
+    <div id="school" class="building">
+        <div class="sign">ШКОЛА</div>
+    </div>
+
+    <div class="fog"></div>
+
+    <div id="flashlight"></div>
+
+    <div id="blackout"></div>
+
+    <div id="player">
+        <div id="head"></div>
+        <div id="body"></div>
+        <div id="legs"></div>
+    </div>
+
+    <div id="joystick">
+        <div id="stick"></div>
+    </div>
+
+    <button id="lightButton">🔦</button>
 
 </div>
-
-<div id="mission">
-
-    <div id="missionTitle">
-        ТЕКУЩЕЕ ЗАДАНИЕ
-    </div>
-
-    <div id="missionText">
-        Найди Алину в парке
-    </div>
-
-</div>
-
-<canvas id="map"></canvas>
-
-<div id="joystick">
-    <div id="stick"></div>
-</div>
-
-<button id="run" class="control">
-    БЕГ
-</button>
-
-<button id="action" class="control">
-    ДЕЙСТВИЕ
-</button>
-
-<div id="toast"></div>
-
 
 <script>
 
-/* ==========================================================
-   НОВЫЙ ШАГ
-   CITY 2.9D
-   Полностью самостоятельная браузерная версия
-========================================================== */
-
-
-/* ==========================================================
-   CANVAS
-========================================================== */
-
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-const mapCanvas = document.getElementById("map");
-const mapCtx = mapCanvas.getContext("2d");
-
-let W = innerWidth;
-let H = innerHeight;
-
-function resize(){
-
-    W = innerWidth;
-    H = innerHeight;
-
-    canvas.width = W;
-    canvas.height = H;
-
-    mapCanvas.width = 230;
-    mapCanvas.height = 170;
-}
-
-resize();
-
-window.addEventListener("resize",resize);
-
-
-/* ==========================================================
-   WORLD
-========================================================== */
-
-const WORLD_WIDTH = 4200;
-const WORLD_HEIGHT = 3100;
-
-const player = {
-
-    x:2050,
-    y:1540,
-
-    speed:3.7,
-    runSpeed:5.6,
-
-    direction:"down",
-
-    animation:0
-};
-
-const camera = {
-    x:0,
-    y:0
-};
-
-
-/* ==========================================================
-   PROGRESS
-========================================================== */
-
-let money = Number(localStorage.getItem("ns_money") || 100);
-let xp = Number(localStorage.getItem("ns_xp") || 0);
-let level = Number(localStorage.getItem("ns_level") || 1);
-let stars = Number(localStorage.getItem("ns_stars") || 0);
-
-let missionIndex = 0;
-
-
-/* ==========================================================
-   ROADS
-========================================================== */
-
-const roads = [
-
-    {x:0,y:400,w:4200,h:150},
-    {x:0,y:960,w:4200,h:165},
-    {x:0,y:1530,w:4200,h:175},
-    {x:0,y:2130,w:4200,h:165},
-    {x:0,y:2700,w:4200,h:165},
-
-    {x:460,y:0,w:155,h:3100},
-    {x:1260,y:0,w:165,h:3100},
-    {x:2070,y:0,w:165,h:3100},
-    {x:2890,y:0,w:165,h:3100},
-    {x:3650,y:0,w:155,h:3100}
-];
-
-
-/* ==========================================================
-   RIVER
-========================================================== */
-
-const river = {
-    x:3850,
-    y:0,
-    w:350,
-    h:3100
-};
-
-
-/* ==========================================================
-   BUILDINGS
-========================================================== */
-
-const buildings = [];
-
-function addBuilding(x,y,w,h,type){
-
-    buildings.push({
-        x:x,
-        y:y,
-        w:w,
-        h:h,
-        type:type,
-        shade:Math.random()
-    });
-}
-
-const buildingData = [
-
-    [30,50,350,285,"house"],
-    [675,50,270,285,"house"],
-    [980,50,220,285,"shop"],
-    [1510,50,330,285,"office"],
-    [2320,50,420,285,"office"],
-    [3050,50,360,285,"house"],
-
-    [30,585,350,280,"house"],
-    [675,585,270,280,"cafe"],
-    [980,585,220,280,"house"],
-    [1510,585,330,280,"office"],
-    [2320,585,420,280,"office"],
-    [3050,585,360,280,"shop"],
-
-    [30,1150,350,290,"house"],
-    [675,1150,270,290,"shop"],
-    [980,1150,220,290,"police"],
-    [1510,1150,330,290,"hospital"],
-    [2320,1150,420,290,"office"],
-    [3050,1150,360,290,"shop"],
-
-    [30,1740,350,300,"house"],
-    [675,1740,270,300,"house"],
-    [980,1740,220,300,"cafe"],
-    [1510,1740,330,300,"office"],
-    [2320,1740,420,300,"house"],
-    [3050,1740,360,300,"shop"],
-
-    [30,2340,350,300,"house"],
-    [675,2340,270,300,"house"],
-    [980,2340,220,300,"shop"],
-    [1510,2340,330,300,"office"],
-    [2320,2340,420,300,"house"],
-    [3050,2340,360,300,"garage"]
-];
-
-buildingData.forEach(v=>addBuilding(...v));
-
-
-/* ==========================================================
-   PARKS
-========================================================== */
-
-const parks = [
-
-    {x:650,y:310,w:550,h:70},
-    {x:1460,y:310,w:520,h:70},
-
-    {x:650,y:1090,w:530,h:55},
-    {x:1460,y:1090,w:520,h:55},
-
-    {x:1460,y:2050,w:520,h:55},
-
-    {x:650,y:2650,w:530,h:55}
-];
-
-
-/* ==========================================================
-   COLLISION
-========================================================== */
-
-function isBlocked(x,y){
-
-    for(const b of buildings){
-
-        if(
-            x > b.x-14 &&
-            x < b.x+b.w+14 &&
-            y > b.y-14 &&
-            y < b.y+b.h+14
-        ){
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-/* ==========================================================
-   TREES
-========================================================== */
-
-const trees = [];
-
-for(const p of parks){
-
-    for(let i=0;i<30;i++){
-
-        trees.push({
-
-            x:p.x+15+Math.random()*(p.w-30),
-
-            y:p.y+5+Math.random()*Math.max(25,p.h-10),
-
-            scale:.65+Math.random()*.5
-        });
-    }
-}
-
-for(let i=0;i<190;i++){
-
-    const x=50+Math.random()*3600;
-    const y=50+Math.random()*2900;
-
-    if(!isBlocked(x,y) && x<3800){
-
-        trees.push({
-
-            x:x,
-            y:y,
-            scale:.55+Math.random()*.55
-        });
-    }
-}
-
-
-/* ==========================================================
-   NPC
-========================================================== */
-
-const npcNames = [
-
-    "Маша",
-    "Илья",
-    "Катя",
-    "Лёша",
-    "Дима",
-    "Соня",
-    "Макс",
-    "Оля",
-    "Артём",
-    "Ника",
-    "Миша",
-    "Лера",
-    "Егор",
-    "Вика",
-    "Рома",
-    "Полина",
-    "Кирилл",
-    "Аня",
-    "Саша",
-    "Даня"
-];
-
-const clothes = [
-
-    ["#d38a87","#3d4654"],
-    ["#7896ad","#424d59"],
-    ["#c69b70","#4a4450"],
-    ["#789d78","#45494c"],
-    ["#a8779e","#3d4651"],
-    ["#c47e5c","#4a4a42"]
-];
-
-function createNPC(x,y,name,index){
-
-    const colors = clothes[index%clothes.length];
-
-    return {
-
-        x:x,
-        y:y,
-
-        name:name,
-
-        skin:["#d9a17e","#e2ad8d","#c99172"][index%3],
-
-        hair:["#352824","#51352b","#272525","#704b37"][index%4],
-
-        shirt:colors[0],
-
-        pants:colors[1],
-
-        dx:Math.random()-.5,
-
-        dy:Math.random()-.5,
-
-        speed:.22+Math.random()*.32,
-
-        timer:50+Math.random()*160,
-
-        animation:Math.random()*10
-    };
-}
-
-const npcs=[];
-
-for(let i=0;i<42;i++){
-
-    let x;
-    let y;
-
-    do{
-
-        x=80+Math.random()*3500;
-        y=80+Math.random()*2850;
-
-    }while(isBlocked(x,y) || x>3780);
-
-    npcs.push(
-        createNPC(
-            x,
-            y,
-            npcNames[i%npcNames.length],
-            i
-        )
-    );
-}
-
-
-/* ==========================================================
-   ALINA
-========================================================== */
-
-const alina = {
-
-    x:850,
-    y:340,
-
-    name:"Алина",
-
-    skin:"#e1aa87",
-    hair:"#2e2524",
-    shirt:"#b66d86",
-    pants:"#454a59",
-
-    dx:0,
-    dy:0,
-
-    speed:.18,
-
-    timer:100,
-
-    animation:0
-};
-
-
-/* ==========================================================
-   CARS
-========================================================== */
-
-const cars=[];
-
-const carColors = [
-
-    "#b83f43",
-    "#3e6686",
-    "#c09a3b",
-    "#d8d8d2",
-    "#4a5b61",
-    "#725c7c",
-    "#996447",
-    "#30363c"
-];
-
-const horizontalRoads=[475,1030,1615,2210,2780];
-
-for(let i=0;i<38;i++){
-
-    cars.push({
-
-        x:Math.random()*3700,
-
-        y:horizontalRoads[i%horizontalRoads.length]+
-           (i%2? -32:32),
-
-        direction:i%2?1:-1,
-
-        speed:.65+Math.random()*1.05,
-
-        color:carColors[i%carColors.length],
-
-        type:i%7===0 ?
-             "sport" :
-             i%5===0 ?
-             "suv" :
-             "sedan"
-    });
-}
-
-
-/* ==========================================================
-   JOYSTICK
-========================================================== */
-
-const joystick = document.getElementById("joystick");
+const player = document.getElementById("player");
 const stick = document.getElementById("stick");
+const joystick = document.getElementById("joystick");
+const flashlight = document.getElementById("flashlight");
+const message = document.getElementById("message");
+const lightButton = document.getElementById("lightButton");
 
-let joyX=0;
-let joyY=0;
-let joystickActive=false;
+let x = window.innerWidth / 2;
+let y = window.innerHeight * 0.68;
 
-function setJoystick(x,y){
+let moving = false;
+let lightOn = true;
 
-    const r=joystick.getBoundingClientRect();
+let joyX = 0;
+let joyY = 0;
 
-    let dx=x-(r.left+r.width/2);
-    let dy=y-(r.top+r.height/2);
+function updatePlayer() {
 
-    const max=32;
+    x += joyX * 3;
+    y += joyY * 3;
 
-    const distance=Math.hypot(dx,dy);
+    x = Math.max(20, Math.min(window.innerWidth - 20, x));
+    y = Math.max(120, Math.min(window.innerHeight - 80, y));
 
-    if(distance>max){
+    player.style.left = x + "px";
+    player.style.top = y + "px";
 
-        dx=dx/distance*max;
-        dy=dy/distance*max;
-    }
+    flashlight.style.left = x + "px";
+    flashlight.style.top = (y - 35) + "px";
 
-    joyX=dx/max;
-    joyY=dy/max;
-
-    stick.style.transform=
-        "translate("+dx+"px,"+dy+"px)";
+    checkPlace();
 }
 
-function stopJoystick(){
+function checkPlace() {
 
-    joyX=0;
-    joyY=0;
-
-    joystickActive=false;
-
-    stick.style.transform=
-        "translate(0,0)";
-}
-
-joystick.addEventListener("pointerdown",e=>{
-
-    joystickActive=true;
-
-    joystick.setPointerCapture(e.pointerId);
-
-    setJoystick(e.clientX,e.clientY);
-});
-
-joystick.addEventListener("pointermove",e=>{
-
-    if(joystickActive){
-
-        setJoystick(e.clientX,e.clientY);
+    if (x < window.innerWidth * .3 && y < window.innerHeight * .7) {
+        message.textContent = "Старый дом... Внутри что-то блеснуло.";
     }
-});
-
-joystick.addEventListener("pointerup",stopJoystick);
-joystick.addEventListener("pointercancel",stopJoystick);
-
-
-/* ==========================================================
-   KEYBOARD
-========================================================== */
-
-const keys={};
-
-window.addEventListener("keydown",e=>{
-
-    keys[e.key.toLowerCase()]=true;
-});
-
-window.addEventListener("keyup",e=>{
-
-    keys[e.key.toLowerCase()]=false;
-});
-
-
-/* ==========================================================
-   RUN
-========================================================== */
-
-const runButton=document.getElementById("run");
-
-let running=false;
-
-runButton.addEventListener("pointerdown",()=>{
-
-    running=true;
-
-    runButton.classList.add("active");
-});
-
-runButton.addEventListener("pointerup",()=>{
-
-    running=false;
-
-    runButton.classList.remove("active");
-});
-
-runButton.addEventListener("pointercancel",()=>{
-
-    running=false;
-
-    runButton.classList.remove("active");
-});
-
-
-/* ==========================================================
-   PLAYER UPDATE
-========================================================== */
-
-function updatePlayer(){
-
-    let dx=0;
-    let dy=0;
-
-    if(keys.w || keys.arrowup) dy--;
-    if(keys.s || keys.arrowdown) dy++;
-    if(keys.a || keys.arrowleft) dx--;
-    if(keys.d || keys.arrowright) dx++;
-
-    if(Math.abs(joyX)>.05) dx=joyX;
-    if(Math.abs(joyY)>.05) dy=joyY;
-
-    if(dx===0 && dy===0){
-
-        return;
+    else if (x > window.innerWidth * .7 && y < window.innerHeight * .7) {
+        message.textContent = "Заброшенный магазин. Дверь заперта.";
     }
-
-    const length=Math.hypot(dx,dy);
-
-    dx/=length;
-    dy/=length;
-
-    if(Math.abs(dx)>Math.abs(dy)){
-
-        player.direction=
-            dx>0 ? "right":"left";
-
-    }else{
-
-        player.direction=
-            dy>0 ? "down":"up";
+    else if (
+        x > window.innerWidth * .38 &&
+        x < window.innerWidth * .62 &&
+        y < window.innerHeight * .55
+    ) {
+        message.textContent = "Старая школа. На втором этаже горит свет.";
     }
-
-    const speed=
-        running ?
-        player.runSpeed :
-        player.speed;
-
-    const nx=
-        player.x+dx*speed;
-
-    const ny=
-        player.y+dy*speed;
-
-    if(
-        nx>25 &&
-        nx<WORLD_WIDTH-25 &&
-        !isBlocked(nx,player.y)
-    ){
-
-        player.x=nx;
-    }
-
-    if(
-        ny>25 &&
-        ny<WORLD_HEIGHT-25 &&
-        !isBlocked(player.x,ny)
-    ){
-
-        player.y=ny;
-    }
-
-    player.animation+=.25;
-}
-
-
-/* ==========================================================
-   NPC UPDATE
-========================================================== */
-
-function updateNPC(n){
-
-    n.timer--;
-
-    if(n.timer<=0){
-
-        const angle=
-            Math.random()*Math.PI*2;
-
-        n.dx=Math.cos(angle);
-        n.dy=Math.sin(angle);
-
-        n.timer=
-            80+Math.random()*180;
-    }
-
-    const nx=
-        n.x+n.dx*n.speed;
-
-    const ny=
-        n.y+n.dy*n.speed;
-
-    if(
-        nx>40 &&
-        nx<WORLD_WIDTH-40 &&
-        !isBlocked(nx,n.y)
-    ){
-
-        n.x=nx;
-
-    }else{
-
-        n.dx*=-1;
-    }
-
-    if(
-        ny>40 &&
-        ny<WORLD_HEIGHT-40 &&
-        !isBlocked(n.x,ny)
-    ){
-
-        n.y=ny;
-
-    }else{
-
-        n.dy*=-1;
-    }
-
-    n.animation+=.08;
-}
-
-
-/* ==========================================================
-   ALINA UPDATE
-========================================================== */
-
-function updateAlina(){
-
-    alina.timer--;
-
-    if(alina.timer<=0){
-
-        const angle=
-            Math.random()*Math.PI*2;
-
-        alina.dx=Math.cos(angle);
-        alina.dy=Math.sin(angle);
-
-        alina.timer=
-            100+Math.random()*180;
-    }
-
-    const nx=
-        alina.x+alina.dx*alina.speed;
-
-    const ny=
-        alina.y+alina.dy*alina.speed;
-
-    if(!isBlocked(nx,alina.y)){
-
-        alina.x=nx;
-
-    }else{
-
-        alina.dx*=-1;
-    }
-
-    if(!isBlocked(alina.x,ny)){
-
-        alina.y=ny;
-
-    }else{
-
-        alina.dy*=-1;
-    }
-
-    alina.animation+=.08;
-}
-
-
-/* ==========================================================
-   CAR UPDATE
-========================================================== */
-
-function updateCars(){
-
-    for(const car of cars){
-
-        car.x+=
-            car.speed*
-            car.direction;
-
-        if(car.x>WORLD_WIDTH+100){
-
-            car.x=-100;
-        }
-
-        if(car.x<-100){
-
-            car.x=
-                WORLD_WIDTH+100;
-        }
+    else {
+        message.textContent = "Ты один посреди пустого города...";
     }
 }
 
+/* Джойстик */
 
-/* ==========================================================
-   CAMERA
-========================================================== */
+function moveStick(clientX, clientY) {
 
-function updateCamera(){
+    const rect = joystick.getBoundingClientRect();
 
-    const targetX=
-        player.x-W/2;
+    let dx = clientX - (rect.left + rect.width / 2);
+    let dy = clientY - (rect.top + rect.height / 2);
 
-    const targetY=
-        player.y-H/2;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const max = 38;
 
-    camera.x +=
-        (targetX-camera.x)*.10;
+    if (distance > max) {
+        dx = dx / distance * max;
+        dy = dy / distance * max;
+    }
 
-    camera.y +=
-        (targetY-camera.y)*.10;
+    stick.style.transform =
+        `translate(${dx}px, ${dy}px)`;
 
-    camera.x=
-        Math.max(
-            0,
-            Math.min(
-                WORLD_WIDTH-W,
-                camera.x
-            )
-        );
-
-    camera.y=
-        Math.max(
-            0,
-            Math.min(
-                WORLD_HEIGHT-H,
-                camera.y
-            )
-        );
+    joyX = dx / max;
+    joyY = dy / max;
 }
 
-
-/* ==========================================================
-   BACKGROUND
-========================================================== */
-
-function drawSky(){
-
-    const gradient=
-        ctx.createLinearGradient(
-            0,0,
-            0,H
-        );
-
-    gradient.addColorStop(
-        0,
-        "#4f7081"
-    );
-
-    gradient.addColorStop(
-        .48,
-        "#9db1aa"
-    );
-
-    gradient.addColorStop(
-        1,
-        "#738078"
-    );
-
-    ctx.fillStyle=gradient;
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-}
-
-
-/* ==========================================================
-   GROUND
-========================================================== */
-
-function drawGround(){
-
-    ctx.fillStyle="#718477";
-
-    ctx.fillRect(
-        0,
-        0,
-        WORLD_WIDTH,
-        WORLD_HEIGHT
-    );
-
-
-    /* River */
-
-    ctx.fillStyle="#4d8799";
-
-    ctx.fillRect(
-        river.x,
-        river.y,
-        river.w,
-        river.h
-    );
-
-
-    /* Water reflections */
-
-    ctx.strokeStyle=
-        "rgba(255,255,255,.09)";
-
-    ctx.lineWidth=2;
-
-    for(let y=0;y<WORLD_HEIGHT;y+=55){
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            river.x+15,
-            y
-        );
-
-        ctx.lineTo(
-            river.x+river.w-15,
-            y+8
-        );
-
-        ctx.stroke();
-    }
-}
-
-
-/* ==========================================================
-   ROADS
-========================================================== */
-
-function drawRoads(){
-
-    for(const road of roads){
-
-        ctx.fillStyle="#343b3e";
-
-        ctx.fillRect(
-            road.x,
-            road.y,
-            road.w,
-            road.h
-        );
-
-
-        /* road edge */
-
-        ctx.fillStyle=
-            "rgba(0,0,0,.22)";
-
-        if(road.w>road.h){
-
-            ctx.fillRect(
-                road.x,
-                road.y,
-                road.w,
-                7
-            );
-
-            ctx.fillRect(
-                road.x,
-                road.y+road.h-7,
-                road.w,
-                7
-            );
-
-        }else{
-
-            ctx.fillRect(
-                road.x,
-                road.y,
-                7,
-                road.h
-            );
-
-            ctx.fillRect(
-                road.x+road.w-7,
-                road.y,
-                7,
-                road.h
-            );
-        }
-
-
-        /* center lines */
-
-        ctx.strokeStyle=
-            "rgba(232,211,128,.65)";
-
-        ctx.lineWidth=3;
-
-        ctx.setLineDash([
-            28,
-            25
-        ]);
-
-        ctx.beginPath();
-
-        if(road.w>road.h){
-
-            ctx.moveTo(
-                road.x,
-                road.y+road.h/2
-            );
-
-            ctx.lineTo(
-                road.x+road.w,
-                road.y+road.h/2
-            );
-
-        }else{
-
-            ctx.moveTo(
-                road.x+road.w/2,
-                road.y
-            );
-
-            ctx.lineTo(
-                road.x+road.w/2,
-                road.y+road.h
-            );
-        }
-
-        ctx.stroke();
-
-        ctx.setLineDash([]);
-    }
-}
-
-
-/* ==========================================================
-   PARKS
-========================================================== */
-
-function drawParks(){
-
-    for(const park of parks){
-
-        ctx.fillStyle="#4f7257";
-
-        ctx.fillRect(
-            park.x,
-            park.y,
-            park.w,
-            park.h
-        );
-
-        ctx.fillStyle=
-            "rgba(255,255,255,.07)";
-
-        for(let i=0;i<4;i++){
-
-            ctx.fillRect(
-                park.x,
-                park.y+i*16,
-                park.w,
-                2
-            );
-        }
-    }
-}
-
-
-/* ==========================================================
-   BUILDINGS
-========================================================== */
-
-function drawBuildings(){
-
-    for(const b of buildings){
-
-        /* long shadow */
-
-        ctx.fillStyle=
-            "rgba(0,0,0,.22)";
-
-        ctx.fillRect(
-            b.x+15,
-            b.y+18,
-            b.w,
-            b.h
-        );
-
-
-        /* main building */
-
-        const buildingColors=[
-            "#68757a",
-            "#756e6b",
-            "#65756c",
-            "#706f77"
-        ];
-
-        ctx.fillStyle=
-            buildingColors[
-                Math.floor(b.shade*4)
-            ];
-
-        ctx.fillRect(
-            b.x,
-            b.y,
-            b.w,
-            b.h
-        );
-
-
-        /* roof */
-
-        ctx.fillStyle="#40484b";
-
-        ctx.fillRect(
-            b.x,
-            b.y,
-            b.w,
-            15
-        );
-
-
-        /* vertical details */
-
-        ctx.strokeStyle=
-            "rgba(255,255,255,.08)";
-
-        ctx.lineWidth=2;
-
-        for(
-            let xx=b.x+55;
-            xx<b.x+b.w;
-            xx+=55
-        ){
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                xx,
-                b.y
-            );
-
-            ctx.lineTo(
-                xx,
-                b.y+b.h
-            );
-
-            ctx.stroke();
-        }
-
-
-        /* windows */
-
-        for(
-            let xx=b.x+18;
-            xx<b.x+b.w-24;
-            xx+=46
-        ){
-
-            for(
-                let yy=b.y+30;
-                yy<b.y+b.h-40;
-                yy+=48
-            ){
-
-                ctx.fillStyle=
-                    ((xx+yy)%92<46)
-                    ?
-                    "#82aab5"
-                    :
-                    "#668b95";
-
-                ctx.fillRect(
-                    xx,
-                    yy,
-                    25,
-                    18
-                );
-
-                ctx.fillStyle=
-                    "rgba(255,224,150,.10)";
-
-                ctx.fillRect(
-                    xx+2,
-                    yy+2,
-                    21,
-                    14
-                );
-            }
-        }
-
-
-        /* entrance */
-
-        ctx.fillStyle="#283033";
-
-        ctx.fillRect(
-            b.x+b.w/2-15,
-            b.y+b.h-54,
-            30,
-            54
-        );
-
-
-        /* labels */
-
-        if(
-            b.type==="police" ||
-            b.type==="hospital" ||
-            b.type==="cafe" ||
-            b.type==="shop" ||
-            b.type==="garage"
-        ){
-
-            let text="";
-
-            if(b.type==="police")
-                text="ПОЛИЦИЯ";
-
-            if(b.type==="hospital")
-                text="БОЛЬНИЦА";
-
-            if(b.type==="cafe")
-                text="КАФЕ";
-
-            if(b.type==="shop")
-                text="МАГАЗИН";
-
-            if(b.type==="garage")
-                text="GARAGE";
-
-            ctx.fillStyle=
-                "rgba(255,255,255,.9)";
-
-            ctx.font=
-                "bold 11px Arial";
-
-            ctx.textAlign="center";
-
-            ctx.fillText(
-                text,
-                b.x+b.w/2,
-                b.y+28
-            );
-        }
-    }
-}
-
-
-/* ==========================================================
-   TREES
-========================================================== */
-
-function drawTrees(){
-
-    for(const tree of trees){
-
-        const s=tree.scale;
-
-        /* shadow */
-
-        ctx.fillStyle=
-            "rgba(0,0,0,.22)";
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            tree.x+6,
-            tree.y+20,
-            19*s,
-            7*s,
-            0,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-
-        /* trunk */
-
-        ctx.fillStyle="#614734";
-
-        ctx.fillRect(
-            tree.x-3*s,
-            tree.y-2,
-            6*s,
-            25*s
-        );
-
-
-        /* crown */
-
-        ctx.fillStyle="#34553b";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            tree.x,
-            tree.y-10*s,
-            23*s,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle="#5e805d";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            tree.x-8*s,
-            tree.y-17*s,
-            12*s,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle="#79956d";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            tree.x+8*s,
-            tree.y-7*s,
-            9*s,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-    }
-}
-
-
-/* ==========================================================
-   CARS
-========================================================== */
-
-function drawCar(car){
-
-    ctx.save();
-
-    ctx.translate(
-        car.x,
-        car.y
-    );
-
-    if(car.direction<0){
-
-        ctx.scale(-1,1);
-    }
-
-    const width=
-        car.type==="sport"
-        ? 63
-        : car.type==="suv"
-        ? 67
-        : 59;
-
-    const height=
-        car.type==="suv"
-        ? 27
-        : 23;
-
-
-    /* shadow */
-
-    ctx.fillStyle=
-        "rgba(0,0,0,.38)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        3,
-        10,
-        width*.55,
-        8,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* body */
-
-    ctx.fillStyle=
-        car.color;
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-        -width/2,
-        -height/2,
-        width,
-        height,
-        6
-    );
-
-    ctx.fill();
-
-
-    /* body highlight */
-
-    ctx.fillStyle=
-        "rgba(255,255,255,.10)";
-
-    ctx.fillRect(
-        -width/2,
-        -height/2+3,
-        width*.55,
-        4
-    );
-
-
-    /* roof */
-
-    ctx.fillStyle=
-        car.color;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        -width*.25,
-        -height/2
-    );
-
-    ctx.lineTo(
-        -width*.08,
-        -height*.82
-    );
-
-    ctx.lineTo(
-        width*.20,
-        -height*.82
-    );
-
-    ctx.lineTo(
-        width*.34,
-        -height/2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    /* windows */
-
-    ctx.fillStyle="#7899a5";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        -width*.18,
-        -height*.43
-    );
-
-    ctx.lineTo(
-        -width*.05,
-        -height*.72
-    );
-
-    ctx.lineTo(
-        width*.08,
-        -height*.72
-    );
-
-    ctx.lineTo(
-        width*.21,
-        -height*.43
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    /* glass reflection */
-
-    ctx.fillStyle=
-        "rgba(255,255,255,.28)";
-
-    ctx.fillRect(
-        -width*.08,
-        -height*.68,
-        width*.13,
-        3
-    );
-
-
-    /* wheels */
-
-    ctx.fillStyle="#171b1d";
-
-    ctx.fillRect(
-        -width*.35,
-        -height*.68,
-        12,
-        7
-    );
-
-    ctx.fillRect(
-        width*.18,
-        -height*.68,
-        12,
-        7
-    );
-
-    ctx.fillRect(
-        -width*.35,
-        height*.48,
-        12,
-        7
-    );
-
-    ctx.fillRect(
-        width*.18,
-        height*.48,
-        12,
-        7
-    );
-
-
-    /* lights */
-
-    ctx.fillStyle="#fff2b3";
-
-    ctx.fillRect(
-        width/2-5,
-        -height*.34,
-        5,
-        6
-    );
-
-    ctx.fillStyle="#d94d4d";
-
-    ctx.fillRect(
-        -width/2,
-        -height*.34,
-        5,
-        6
-    );
-
-
-    ctx.restore();
-}
-
-
-/* ==========================================================
-   PEOPLE
-========================================================== */
-
-function drawPerson(n,isPlayer=false){
-
-    const bob=
-        Math.sin(n.animation)*2;
-
-    const x=n.x;
-    const y=n.y+bob;
-
-
-    /* shadow */
-
-    ctx.fillStyle=
-        "rgba(0,0,0,.25)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        x,
-        y+28,
-        18,
-        7,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* legs */
-
-    ctx.fillStyle=n.pants;
-
-    ctx.fillRect(
-        x-8,
-        y+6,
-        7,
-        20
-    );
-
-    ctx.fillRect(
-        x+1,
-        y+6,
-        7,
-        20
-    );
-
-
-    /* shoes */
-
-    ctx.fillStyle="#202426";
-
-    ctx.fillRect(
-        x-10,
-        y+23,
-        9,
-        5
-    );
-
-    ctx.fillRect(
-        x+2,
-        y+23,
-        9,
-        5
-    );
-
-
-    /* body */
-
-    ctx.fillStyle=n.shirt;
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-        x-12,
-        y-8,
-        24,
-        22,
-        7
-    );
-
-    ctx.fill();
-
-
-    /* arms */
-
-    ctx.fillStyle=n.skin;
-
-    ctx.fillRect(
-        x-16,
-        y-5,
-        6,
-        17
-    );
-
-    ctx.fillRect(
-        x+10,
-        y-5,
-        6,
-        17
-    );
-
-
-    /* head */
-
-    ctx.fillStyle=n.skin;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y-18,
-        13,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* hair */
-
-    ctx.fillStyle=n.hair;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y-23,
-        13,
-        Math.PI,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    ctx.fillRect(
-        x-13,
-        y-24,
-        26,
-        7
-    );
-
-
-    /* eyes */
-
-    ctx.fillStyle="#332923";
-
-    ctx.fillRect(
-        x-6,
-        y-18,
-        2,
-        2
-    );
-
-    ctx.fillRect(
-        x+4,
-        y-18,
-        2,
-        2
-    );
-
-
-    /* NPC name */
-
-    if(
-        !isPlayer &&
-        distance(player,n)<120
-    ){
-
-        ctx.fillStyle=
-            "rgba(255,255,255,.9)";
-
-        ctx.font="9px Arial";
-
-        ctx.textAlign="center";
-
-        ctx.fillText(
-            n.name,
-            x,
-            y-40
-        );
-    }
-
-
-    /* Alina marker */
-
-    if(n===alina){
-
-        ctx.fillStyle="#a6dfbd";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x,
-            y-54
-        );
-
-        ctx.lineTo(
-            x-7,
-            y-43
-        );
-
-        ctx.lineTo(
-            x+7,
-            y-43
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-
-        ctx.fillStyle="white";
-
-        ctx.font="bold 10px Arial";
-
-        ctx.textAlign="center";
-
-        ctx.fillText(
-            "АЛИНА",
-            x,
-            y-59
-        );
-    }
-}
-
-
-/* ==========================================================
-   PLAYER
-========================================================== */
-
-function drawPlayer(){
-
-    drawPerson({
-
-        x:player.x,
-        y:player.y,
-
-        skin:"#e2ae8c",
-        hair:"#3b2925",
-        shirt:"#c96f7c",
-        pants:"#424b5b",
-
-        animation:player.animation
-
-    },true);
-}
-
-
-/* ==========================================================
-   WORLD RENDER
-========================================================== */
-
-function renderWorld(){
-
-    drawSky();
-
-    ctx.save();
-
-    ctx.translate(
-        -camera.x,
-        -camera.y
-    );
-
-
-    drawGround();
-
-    drawRoads();
-
-    drawParks();
-
-    drawBuildings();
-
-    drawTrees();
-
-
-    /* cars */
-
-    for(const car of cars){
-
-        drawCar(car);
-    }
-
-
-    /* actors sorted by depth */
-
-    const actors=[
-        ...npcs,
-        alina,
-        {
-            x:player.x,
-            y:player.y,
-            player:true
-        }
-    ];
-
-    actors.sort(
-        (a,b)=>a.y-b.y
-    );
-
-
-    for(const actor of actors){
-
-        if(actor.player){
-
-            drawPlayer();
-
-        }else{
-
-            drawPerson(actor);
-        }
-    }
-
-
-    ctx.restore();
-}
-
-
-/* ==========================================================
-   MINI MAP
-========================================================== */
-
-function renderMiniMap(){
-
-    mapCtx.clearRect(
-        0,
-        0,
-        230,
-        170
-    );
-
-
-    mapCtx.fillStyle="#526b58";
-
-    mapCtx.fillRect(
-        0,
-        0,
-        230,
-        170
-    );
-
-
-    /* river */
-
-    mapCtx.fillStyle="#3f7e91";
-
-    mapCtx.fillRect(
-        river.x/WORLD_WIDTH*230,
-        0,
-        river.w/WORLD_WIDTH*230,
-        170
-    );
-
-
-    /* roads */
-
-    mapCtx.fillStyle="#343b3d";
-
-    for(const road of roads){
-
-        mapCtx.fillRect(
-
-            road.x/WORLD_WIDTH*230,
-
-            road.y/WORLD_HEIGHT*170,
-
-            road.w/WORLD_WIDTH*230,
-
-            road.h/WORLD_HEIGHT*170
-        );
-    }
-
-
-    /* buildings */
-
-    mapCtx.fillStyle="#77706c";
-
-    for(const building of buildings){
-
-        mapCtx.fillRect(
-
-            building.x/WORLD_WIDTH*230,
-
-            building.y/WORLD_HEIGHT*170,
-
-            building.w/WORLD_WIDTH*230,
-
-            building.h/WORLD_HEIGHT*170
-        );
-    }
-
-
-    /* player */
-
-    mapCtx.fillStyle="#ffffff";
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-
-        player.x/WORLD_WIDTH*230,
-
-        player.y/WORLD_HEIGHT*170,
-
-        4,
-
-        0,
-
-        Math.PI*2
-    );
-
-    mapCtx.fill();
-
-
-    /* Alina */
-
-    mapCtx.fillStyle="#a7dfbd";
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-
-        alina.x/WORLD_WIDTH*230,
-
-        alina.y/WORLD_HEIGHT*170,
-
-        3,
-
-        0,
-
-        Math.PI*2
-    );
-
-    mapCtx.fill();
-}
-
-
-/* ==========================================================
-   DISTANCE
-========================================================== */
-
-function distance(a,b){
-
-    return Math.hypot(
-        a.x-b.x,
-        a.y-b.y
-    );
-}
-
-
-/* ==========================================================
-   MISSIONS
-========================================================== */
-
-const missions=[
-
-    {
-        text:"Найди Алину в парке",
-        target:alina,
-        reward:25
-    },
-
-    {
-        text:"Встреться с Алиной возле кафе",
-        target:{x:820,y:630},
-        reward:30
-    },
-
-    {
-        text:"Купи кофе",
-        target:{x:820,y:630},
-        reward:35
-    },
-
-    {
-        text:"Забери посылку на почте",
-        target:{x:200,y:1200},
-        reward:55
-    },
-
-    {
-        text:"Отнеси посылку Алине",
-        target:alina,
-        reward:65
-    },
-
-    {
-        text:"Зайди в магазин",
-        target:{x:3180,y:1200},
-        reward:45
-    },
-
-    {
-        text:"Поговори с полицейским",
-        target:{x:1090,y:1200},
-        reward:70
-    },
-
-    {
-        text:"Посети больницу",
-        target:{x:1660,y:1200},
-        reward:60
-    },
-
-    {
-        text:"Найди гараж",
-        target:{x:3180,y:1800},
-        reward:100
-    },
-
-    {
-        text:"Вернись в центр города",
-        target:{x:2050,y:1540},
-        reward:150
-    },
-
-    {
-        text:"Все задания выполнены! ✨",
-        target:null,
-        reward:0
-    }
-];
-
-
-const missionText=
-    document.getElementById("missionText");
-
-const actionButton=
-    document.getElementById("action");
-
-
-function updateMission(){
-
-    const mission=
-        missions[missionIndex];
-
-
-    if(!mission){
-
-        actionButton.style.display="none";
-
-        return;
-    }
-
-
-    missionText.textContent=
-        mission.text;
-
-
-    if(
-        mission.target &&
-        distance(player,mission.target)<115
-    ){
-
-        actionButton.style.display=
-            "block";
-
-    }else{
-
-        actionButton.style.display=
-            "none";
-    }
-}
-
-
-/* ==========================================================
-   COMPLETE MISSION
-========================================================== */
-
-actionButton.addEventListener("click",()=>{
-
-    const mission=
-        missions[missionIndex];
-
-
-    if(
-        !mission ||
-        !mission.target ||
-        distance(player,mission.target)>115
-    ){
-
-        return;
-    }
-
-
-    money+=mission.reward;
-
-    xp+=25;
-
-    stars+=1;
-
-
-    if(xp>=100){
-
-        xp-=100;
-
-        level++;
-    }
-
-
-    missionIndex++;
-
-
-    saveGame();
-
-    updateHUD();
-
-
-    showToast(
-        "Задание выполнено!  +$"+
-        mission.reward
+joystick.addEventListener("touchstart", e => {
+    moving = true;
+    moveStick(
+        e.touches[0].clientX,
+        e.touches[0].clientY
     );
 });
 
+joystick.addEventListener("touchmove", e => {
 
-/* ==========================================================
-   HUD
-========================================================== */
+    if (!moving) return;
 
-function updateHUD(){
+    moveStick(
+        e.touches[0].clientX,
+        e.touches[0].clientY
+    );
 
-    document.getElementById("money").textContent=
-        "💰 "+money;
+    e.preventDefault();
 
-    document.getElementById("stars").textContent=
-        "⭐ "+stars;
+}, { passive: false });
 
-    document.getElementById("level").textContent=
-        "Уровень "+level;
+joystick.addEventListener("touchend", () => {
 
-    document.getElementById("xpBar").style.width=
-        xp+"%";
+    moving = false;
+
+    stick.style.transform = "translate(0,0)";
+
+    joyX = 0;
+    joyY = 0;
+});
+
+/* Фонарик */
+
+lightButton.addEventListener("click", () => {
+
+    lightOn = !lightOn;
+
+    flashlight.style.opacity = lightOn ? "1" : "0";
+
+    lightButton.textContent =
+        lightOn ? "🔦" : "🌑";
+});
+
+/* Клавиатура для компьютера */
+
+const keys = {};
+
+document.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
+});
+
+document.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+function keyboardControl() {
+
+    joyX = 0;
+    joyY = 0;
+
+    if (keys["a"] || keys["arrowleft"]) joyX = -1;
+    if (keys["d"] || keys["arrowright"]) joyX = 1;
+    if (keys["w"] || keys["arrowup"]) joyY = -1;
+    if (keys["s"] || keys["arrowdown"]) joyY = 1;
 }
 
+/* Игровой цикл */
 
-/* ==========================================================
-   SAVE
-========================================================== */
+function gameLoop() {
 
-function saveGame(){
-
-    localStorage.setItem(
-        "ns_money",
-        money
-    );
-
-    localStorage.setItem(
-        "ns_xp",
-        xp
-    );
-
-    localStorage.setItem(
-        "ns_level",
-        level
-    );
-
-    localStorage.setItem(
-        "ns_stars",
-        stars
-    );
-}
-
-
-/* ==========================================================
-   TOAST
-========================================================== */
-
-let toastTimer;
-
-function showToast(text){
-
-    const toast=
-        document.getElementById("toast");
-
-    toast.textContent=text;
-
-    toast.style.opacity="1";
-
-    clearTimeout(toastTimer);
-
-    toastTimer=setTimeout(()=>{
-
-        toast.style.opacity="0";
-
-    },1800);
-}
-
-
-/* ==========================================================
-   GAME UPDATE
-========================================================== */
-
-function update(){
+    if (!moving) {
+        keyboardControl();
+    }
 
     updatePlayer();
 
-    for(const npc of npcs){
+    requestAnimationFrame(gameLoop);
+}
 
-        updateNPC(npc);
+gameLoop();
+
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Город после полуночи</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05070c;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #263247 0%,
+            #101722 35%,
+            #05070c 75%
+        );
+}
+
+/* Луна */
+
+#moon {
+    position: absolute;
+
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+
+    background: #d9e2e8;
+
+    box-shadow:
+        0 0 45px #aabed0;
+
+    top: 8%;
+    right: 12%;
+}
+
+/* Туман */
+
+.fog {
+    position: absolute;
+
+    width: 160%;
+    height: 35%;
+
+    left: -30%;
+    bottom: 8%;
+
+    background: rgba(180,195,205,.08);
+
+    filter: blur(25px);
+
+    animation: fog 12s linear infinite alternate;
+}
+
+@keyframes fog {
+
+    from {
+        transform: translateX(-8%);
     }
 
-    updateAlina();
+    to {
+        transform: translateX(8%);
+    }
 
-    updateCars();
+}
 
-    updateCamera();
+/* Дорога */
 
-    updateMission();
+#road {
+
+    position: absolute;
+
+    left: 35%;
+    bottom: 0;
+
+    width: 30%;
+    height: 75%;
+
+    background: #11151c;
+
+    clip-path:
+        polygon(
+            42% 0,
+            58% 0,
+            100% 100%,
+            0 100%
+        );
+}
+
+/* Здания */
+
+.building {
+
+    position: absolute;
+
+    bottom: 28%;
+
+    width: 24%;
+    height: 40%;
+
+    background: #171b22;
+
+    border: 3px solid #080a0e;
+
+    box-shadow:
+        0 10px 30px #000;
+}
+
+.building::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 12px;
+
+    background:
+        repeating-linear-gradient(
+            to right,
+            #222a32 0 18px,
+            #080b10 18px 30px
+        );
+
+    opacity: .8;
+}
+
+#house {
+    left: 4%;
+}
+
+#shop {
+    right: 4%;
+}
+
+#school {
+
+    left: 38%;
+
+    bottom: 50%;
+
+    width: 24%;
+    height: 22%;
+
+    background: #20252d;
+}
+
+/* Названия */
+
+.sign {
+
+    position: absolute;
+
+    z-index: 3;
+
+    top: 8px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    white-space: nowrap;
+
+    color: #aebbc5;
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+}
+
+/* Игрок */
+
+#player {
+
+    position: absolute;
+
+    width: 28px;
+    height: 48px;
+
+    left: 50%;
+    top: 68%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 10;
+}
+
+#head {
+
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    background: #c99370;
+
+    left: 5px;
+    top: 0;
+}
+
+#body {
+
+    position: absolute;
+
+    width: 20px;
+    height: 28px;
+
+    border-radius:
+        7px 7px 3px 3px;
+
+    background: #293849;
+
+    left: 4px;
+    top: 17px;
+}
+
+#legs {
+
+    position: absolute;
+
+    width: 7px;
+    height: 17px;
+
+    background: #111722;
+
+    left: 5px;
+    top: 42px;
+
+    box-shadow:
+        11px 0 #111722;
+}
+
+/* Фонарик */
+
+#flashlight {
+
+    position: absolute;
+
+    pointer-events: none;
+
+    z-index: 8;
+
+    left: 50%;
+    top: 63%;
+
+    width: 230px;
+    height: 230px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,220,.24) 0%,
+            rgba(255,255,220,.10) 25%,
+            rgba(255,255,220,.02) 55%,
+            transparent 70%
+        );
+}
+
+/* Верх */
+
+#title {
+
+    position: absolute;
+
+    z-index: 20;
+
+    top: 18px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    text-align: center;
+
+    font-size: 18px;
+
+    letter-spacing: 3px;
+
+    text-shadow:
+        0 0 10px black;
+}
+
+#message {
+
+    position: absolute;
+
+    z-index: 20;
+
+    top: 55px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    width: 90%;
+
+    text-align: center;
+
+    color: #aeb8c1;
+
+    font-size: 13px;
+}
+
+/* Джойстик */
+
+#joystick {
+
+    position: absolute;
+
+    z-index: 30;
+
+    bottom: 25px;
+    left: 25px;
+
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        2px solid rgba(255,255,255,.15);
+}
+
+#stick {
+
+    position: absolute;
+
+    width: 55px;
+    height: 55px;
+
+    left: 33px;
+    top: 33px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(220,230,240,.35);
+
+    border:
+        2px solid rgba(255,255,255,.25);
+}
+
+/* Кнопка */
+
+#lightButton {
+
+    position: absolute;
+
+    z-index: 30;
+
+    bottom: 35px;
+    right: 25px;
+
+    width: 70px;
+    height: 70px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid rgba(255,255,255,.25);
+
+    background:
+        rgba(255,255,255,.1);
+
+    color: white;
+
+    font-size: 28px;
+}
+
+/* Кнопка входа */
+
+#enterButton {
+
+    display: none;
+
+    position: absolute;
+
+    z-index: 40;
+
+    left: 50%;
+    bottom: 130px;
+
+    transform:
+        translateX(-50%);
+
+    padding: 15px 30px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #d6b36a;
+
+    color: #17120b;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 0 25px rgba(214,179,106,.35);
+}
+
+/* Интерьер */
+
+#houseInterior {
+
+    display: none;
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #3b3029,
+            #15110f 60%,
+            #050403
+        );
+}
+
+#interiorText {
+
+    position: absolute;
+
+    top: 25px;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 20px;
+
+    letter-spacing: 2px;
+}
+
+#item {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    font-size: 60px;
+
+    filter:
+        drop-shadow(
+            0 0 15px #ffd76a
+        );
+
+    cursor: pointer;
+}
+
+#itemText {
+
+    position: absolute;
+
+    left: 50%;
+    top: 60%;
+
+    transform:
+        translateX(-50%);
+
+    width: 90%;
+
+    text-align: center;
+
+    color: #ddd;
+
+    font-size: 14px;
+}
+
+#exitButton {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 40px;
+
+    transform:
+        translateX(-50%);
+
+    padding: 14px 35px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #333;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+/* Затемнение */
+
+#blackout {
+
+    position: absolute;
+
+    z-index: 15;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 50% 65%,
+            transparent 0 15%,
+            rgba(0,0,0,.45) 45%,
+            rgba(0,0,0,.85) 100%
+        );
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="moon"></div>
+
+    <div id="title">
+        ГОРОД ПОСЛЕ ПОЛУНОЧИ
+    </div>
+
+    <div id="message">
+        Ты проснулся на пустой улице...
+        Здесь слишком тихо.
+    </div>
+
+    <div id="road"></div>
+
+    <div id="house" class="building">
+        <div class="sign">ДОМ</div>
+    </div>
+
+    <div id="shop" class="building">
+        <div class="sign">МАГАЗИН</div>
+    </div>
+
+    <div id="school" class="building">
+        <div class="sign">ШКОЛА</div>
+    </div>
+
+    <div class="fog"></div>
+
+    <div id="flashlight"></div>
+
+    <div id="blackout"></div>
+
+    <div id="player">
+
+        <div id="head"></div>
+
+        <div id="body"></div>
+
+        <div id="legs"></div>
+
+    </div>
+
+    <div id="joystick">
+
+        <div id="stick"></div>
+
+    </div>
+
+    <button id="lightButton">
+        🔦
+    </button>
+
+    <button id="enterButton">
+        🚪 Войти в дом
+    </button>
+
+    <!-- Дом -->
+
+    <div id="houseInterior">
+
+        <div id="interiorText">
+            СТАРЫЙ ДОМ
+        </div>
+
+        <div id="item">
+            🔑
+        </div>
+
+        <div id="itemText">
+            На полу лежит старый ключ.
+            <br>
+            Нажми на него, чтобы подобрать.
+        </div>
+
+        <button id="exitButton">
+            ↩ Выйти
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const player =
+    document.getElementById("player");
+
+const stick =
+    document.getElementById("stick");
+
+const joystick =
+    document.getElementById("joystick");
+
+const flashlight =
+    document.getElementById("flashlight");
+
+const message =
+    document.getElementById("message");
+
+const lightButton =
+    document.getElementById("lightButton");
+
+const enterButton =
+    document.getElementById("enterButton");
+
+const houseInterior =
+    document.getElementById("houseInterior");
+
+const exitButton =
+    document.getElementById("exitButton");
+
+const item =
+    document.getElementById("item");
+
+let x =
+    window.innerWidth / 2;
+
+let y =
+    window.innerHeight * .68;
+
+let joyX = 0;
+let joyY = 0;
+
+let moving = false;
+
+let lightOn = true;
+
+let hasKey = false;
+
+
+/* Обновление игрока */
+
+function updatePlayer() {
+
+    x += joyX * 3;
+
+    y += joyY * 3;
+
+    x =
+        Math.max(
+            20,
+            Math.min(
+                window.innerWidth - 20,
+                x
+            )
+        );
+
+    y =
+        Math.max(
+            120,
+            Math.min(
+                window.innerHeight - 80,
+                y
+            )
+        );
+
+    player.style.left =
+        x + "px";
+
+    player.style.top =
+        y + "px";
+
+    flashlight.style.left =
+        x + "px";
+
+    flashlight.style.top =
+        (y - 35) + "px";
+
+    checkPlace();
 }
 
 
-/* ==========================================================
-   MAIN LOOP
-========================================================== */
+/* Проверяем положение */
 
-function gameLoop(){
+function checkPlace() {
 
-    update();
+    /*
+       Левая часть города —
+       старый дом
+    */
 
-    renderWorld();
+    if (
+        x <
+        window.innerWidth * .30 &&
+        y <
+        window.innerHeight * .72
+    ) {
 
-    renderMiniMap();
+        message.textContent =
+            "Старый дом... Кажется, дверь открыта.";
+
+        enterButton.style.display =
+            "block";
+
+        return;
+    }
+
+    enterButton.style.display =
+        "none";
+
+    /*
+       Магазин
+    */
+
+    if (
+        x >
+        window.innerWidth * .70 &&
+        y <
+        window.innerHeight * .72
+    ) {
+
+        message.textContent =
+            "Заброшенный магазин. Дверь заперта.";
+
+        return;
+    }
+
+    /*
+       Школа
+    */
+
+    if (
+        x >
+        window.innerWidth * .38 &&
+        x <
+        window.innerWidth * .62 &&
+        y <
+        window.innerHeight * .55
+    ) {
+
+        message.textContent =
+            "Старая школа. На втором этаже горит свет.";
+
+        return;
+    }
+
+    message.textContent =
+        "Ты один посреди пустого города...";
+}
+
+
+/* Вход */
+
+enterButton.addEventListener(
+    "click",
+    () => {
+
+        houseInterior.style.display =
+            "block";
+
+        enterButton.style.display =
+            "none";
+
+        message.style.display =
+            "none";
+
+    }
+);
+
+
+/* Выход */
+
+exitButton.addEventListener(
+    "click",
+    () => {
+
+        houseInterior.style.display =
+            "none";
+
+        message.style.display =
+            "block";
+
+        message.textContent =
+            "Ты снова на улице.";
+
+    }
+);
+
+
+/* Подобрать ключ */
+
+item.addEventListener(
+    "click",
+    () => {
+
+        hasKey = true;
+
+        item.style.display =
+            "none";
+
+        document.getElementById(
+            "itemText"
+        ).innerHTML =
+            "Ты нашёл старый ключ.<br><br>🔑 Ключ получен!";
+
+    }
+);
+
+
+/* Фонарик */
+
+lightButton.addEventListener(
+    "click",
+    () => {
+
+        lightOn =
+            !lightOn;
+
+        flashlight.style.opacity =
+            lightOn ? "1" : "0";
+
+        lightButton.textContent =
+            lightOn ? "🔦" : "🌑";
+
+    }
+);
+
+
+/* Джойстик */
+
+function moveStick(
+    clientX,
+    clientY
+) {
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+    let dx =
+        clientX -
+        (
+            rect.left +
+            rect.width / 2
+        );
+
+    let dy =
+        clientY -
+        (
+            rect.top +
+            rect.height / 2
+        );
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+    const max = 38;
+
+    if (distance > max) {
+
+        dx =
+            dx / distance * max;
+
+        dy =
+            dy / distance * max;
+
+    }
+
+    stick.style.transform =
+        `translate(${dx}px, ${dy}px)`;
+
+    joyX =
+        dx / max;
+
+    joyY =
+        dy / max;
+}
+
+
+joystick.addEventListener(
+    "touchstart",
+    e => {
+
+        moving = true;
+
+        moveStick(
+            e.touches[0].clientX,
+            e.touches[0].clientY
+        );
+
+    }
+);
+
+
+joystick.addEventListener(
+    "touchmove",
+    e => {
+
+        if (!moving)
+            return;
+
+        moveStick(
+            e.touches[0].clientX,
+            e.touches[0].clientY
+        );
+
+        e.preventDefault();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+joystick.addEventListener(
+    "touchend",
+    () => {
+
+        moving = false;
+
+        stick.style.transform =
+            "translate(0,0)";
+
+        joyX = 0;
+        joyY = 0;
+
+    }
+);
+
+
+/* Клавиатура */
+
+const keys = {};
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = true;
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+
+function keyboardControl() {
+
+    if (moving)
+        return;
+
+    joyX = 0;
+    joyY = 0;
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    )
+        joyX = -1;
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    )
+        joyX = 1;
+
+    if (
+        keys["w"] ||
+        keys["arrowup"]
+    )
+        joyY = -1;
+
+    if (
+        keys["s"] ||
+        keys["arrowdown"]
+    )
+        joyY = 1;
+}
+
+
+/* Игровой цикл */
+
+function gameLoop() {
+
+    keyboardControl();
+
+    updatePlayer();
 
     requestAnimationFrame(
         gameLoop
     );
 }
-
-
-/* ==========================================================
-   START
-========================================================== */
-
-updateHUD();
-
-missionText.textContent=
-    missions[0].text;
 
 gameLoop();
 
