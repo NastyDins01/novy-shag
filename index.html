@@ -1571,3 +1571,1697 @@ updateInventory();
 gameLoop();
 
 </script> </body> </html>
+LostCity/
+├── index.html
+├── style.css
+├── game.js
+├── player.js
+├── inventory.js
+├── dialogue.js
+├── events.js
+└── README.md
+┌─────────────────────────────┐
+│       ЗАДАНИЯ               │
+├─────────────────────────────┤
+│ ☑ Найти незнакомца          │
+│ ☑ Найти старый ключ         │
+│ ☐ Найти железнодорожную     │
+│   станцию                    │
+│ ☐ Открыть дверь станции     │
+│ ☐ Узнать, кто ты на самом   │
+│   деле                       │
+└─────────────────────────────┘
+DOCTYPE html> <html lang="ru"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"> <title>Lost City</title> <style> * { box-sizing: border-box; user-select: none; }
+html, body {
+margin: 0;
+width: 100%;
+height: 100%;
+overflow: hidden;
+background: #020307;
+color: white;
+font-family: Arial, sans-serif;
+}
+
+#game {
+position: relative;
+width: 100vw;
+height: 100vh;
+overflow: hidden;
+
+background:
+    radial-gradient(
+        circle at 50% 22%,
+        #34404c 0%,
+        #171d26 32%,
+        #05070b 80%
+    );
+
+}
+/* Небо */
+
+#moon {
+position: absolute;
+
+width: 80px;
+height: 80px;
+
+right: 12%;
+top: 8%;
+
+border-radius: 50%;
+
+background: #dbe6e8;
+
+box-shadow:
+    0 0 35px #a5c4d0,
+    0 0 100px rgba(130,180,210,.25);
+
+}
+/* Здания */
+
+.building {
+position: absolute;
+
+background:
+    linear-gradient(
+        #18202a,
+        #080b10
+    );
+
+border: 2px solid #293746;
+
+box-shadow: 0 0 30px #000;
+
+}
+.b1 {
+width: 130px;
+height: 260px;
+left: 2%;
+bottom: 30%;
+}
+
+.b2 {
+width: 170px;
+height: 200px;
+left: 19%;
+bottom: 30%;
+}
+
+.b3 {
+width: 140px;
+height: 300px;
+right: 20%;
+bottom: 30%;
+}
+
+.b4 {
+width: 180px;
+height: 230px;
+right: 1%;
+bottom: 30%;
+}
+
+/* Окна */
+
+.window {
+position: absolute;
+
+width: 12px;
+height: 18px;
+
+background: #c09c4d;
+
+opacity: .28;
+
+box-shadow:
+    25px 0 #c09c4d,
+    50px 0 #c09c4d,
+    75px 0 #c09c4d,
+    0 35px #c09c4d,
+    25px 35px #c09c4d,
+    50px 35px #c09c4d,
+    75px 35px #c09c4d;
+
+}
+/* Дорога */
+
+#road {
+position: absolute;
+
+left: 50%;
+bottom: -5%;
+
+transform: translateX(-50%);
+
+width: 65%;
+height: 75%;
+
+background:
+    linear-gradient(
+        90deg,
+        #13171b,
+        #24292e,
+        #13171b
+    );
+
+clip-path:
+    polygon(
+        28% 0,
+        72% 0,
+        100% 100%,
+        0 100%
+    );
+
+}
+#roadLine {
+position: absolute;
+
+left: 50%;
+bottom: 0;
+
+transform: translateX(-50%);
+
+width: 7px;
+height: 72%;
+
+background:
+    repeating-linear-gradient(
+        to bottom,
+        #c6b64e 0 35px,
+        transparent 35px 75px
+    );
+
+opacity: .35;
+
+}
+/* NPC */
+
+.npc {
+position: absolute;
+
+width: 31px;
+height: 49px;
+
+border-radius:
+    13px 13px 6px 6px;
+
+}
+#stranger {
+left: 66%;
+bottom: 39%;
+
+background: #75437e;
+
+box-shadow:
+    0 0 20px #bd70ce;
+
+}
+#girl {
+left: 28%;
+bottom: 35%;
+
+background: #38627b;
+
+box-shadow:
+    0 0 20px #579bc2;
+
+}
+/* Магазин */
+
+#shop {
+position: absolute;
+
+left: 5%;
+bottom: 43%;
+
+width: 120px;
+height: 60px;
+
+border: 2px solid #876b43;
+
+background: #241d16;
+
+color: #d5b876;
+
+padding: 20px 8px;
+
+text-align: center;
+
+font-size: 12px;
+
+}
+/* Станция */
+
+#station {
+position: absolute;
+
+right: 7%;
+top: 17%;
+
+width: 175px;
+height: 75px;
+
+background: #151c24;
+
+border: 2px solid #526273;
+
+text-align: center;
+
+padding-top: 27px;
+
+color: #aebdcb;
+
+}
+#station.locked {
+color: #68737e;
+}
+
+/* Предметы */
+
+.item {
+position: absolute;
+
+width: 23px;
+height: 23px;
+
+border-radius: 50%;
+
+}
+.food {
+background: #d79532;
+
+box-shadow:
+    0 0 15px #ffb83d;
+
+}
+.key {
+background: #d7dce0;
+
+box-shadow:
+    0 0 18px #dcefff;
+
+}
+.photo {
+background: #77634a;
+
+box-shadow:
+    0 0 12px #d0b995;
+
+}
+/* Игрок */
+
+#player {
+position: absolute;
+
+width: 30px;
+height: 48px;
+
+left: 50%;
+bottom: 12%;
+
+transform: translateX(-50%);
+
+background: #d8dde1;
+
+border-radius:
+    12px 12px 6px 6px;
+
+box-shadow:
+    0 0 18px #9cc4e2;
+
+z-index: 10;
+
+}
+/* Туман */
+
+#fog {
+position: absolute;
+
+inset: 0;
+
+pointer-events: none;
+
+background:
+    radial-gradient(
+        ellipse,
+        transparent 15%,
+        rgba(150,170,185,.08) 45%,
+        rgba(0,0,0,.85) 100%
+    );
+
+}
+/* HUD */
+
+#hud {
+position: absolute;
+
+top: 10px;
+left: 10px;
+
+z-index: 50;
+
+min-width: 220px;
+
+padding: 12px;
+
+border-radius: 10px;
+
+background: rgba(0,0,0,.67);
+
+border: 1px solid #3a4a59;
+
+backdrop-filter: blur(6px);
+
+}
+.stat {
+margin: 5px 0;
+}
+
+#objective {
+margin-top: 10px;
+
+color: #c0daf2;
+
+font-size: 13px;
+
+line-height: 1.4;
+
+}
+#location {
+margin-top: 7px;
+
+color: #7e91a2;
+
+font-size: 12px;
+
+}
+/* Панель квестов */
+
+#quests {
+position: absolute;
+
+top: 125px;
+left: 10px;
+
+z-index: 50;
+
+width: 220px;
+
+padding: 10px;
+
+background: rgba(0,0,0,.62);
+
+border-radius: 9px;
+
+border: 1px solid #354352;
+
+font-size: 12px;
+
+}
+.quest {
+margin: 6px 0;
+
+color: #aeb8c2;
+
+}
+.quest.done {
+color: #6ca878;
+text-decoration: line-through;
+}
+
+/* Инвентарь */
+
+#inventory {
+position: absolute;
+
+right: 10px;
+top: 10px;
+
+z-index: 50;
+
+width: 160px;
+
+padding: 12px;
+
+background: rgba(0,0,0,.67);
+
+border-radius: 10px;
+
+border: 1px solid #3a4a59;
+
+}
+.inventoryItem {
+margin-top: 7px;
+
+color: #ccd7e0;
+
+font-size: 13px;
+
+}
+/* Диалог */
+
+#dialog {
+display: none;
+
+position: absolute;
+
+left: 50%;
+bottom: 10%;
+
+transform: translateX(-50%);
+
+z-index: 100;
+
+width: min(92%,600px);
+
+padding: 20px;
+
+background: rgba(3,6,10,.97);
+
+border: 1px solid #65798d;
+
+border-radius: 12px;
+
+box-shadow: 0 0 50px #000;
+
+}
+#dialogName {
+color: #a9cbed;
+
+font-weight: bold;
+
+margin-bottom: 10px;
+
+}
+#dialogText {
+line-height: 1.6;
+}
+
+.choice {
+display: block;
+
+width: 100%;
+
+margin-top: 10px;
+
+padding: 11px;
+
+background: #26394d;
+
+border: 1px solid #50667b;
+
+border-radius: 7px;
+
+color: white;
+
+text-align: left;
+
+}
+/* Сообщения */
+
+#message {
+display: none;
+
+position: absolute;
+
+z-index: 120;
+
+left: 50%;
+top: 45%;
+
+transform: translate(-50%,-50%);
+
+width: min(90%,500px);
+
+padding: 18px;
+
+text-align: center;
+
+background: rgba(0,0,0,.9);
+
+border: 1px solid #607386;
+
+border-radius: 9px;
+
+}
+/* Концовка */
+
+#ending {
+display: none;
+
+position: absolute;
+
+inset: 0;
+
+z-index: 300;
+
+background:
+    radial-gradient(
+        circle,
+        #17212c,
+        #020307
+    );
+
+align-items: center;
+
+justify-content: center;
+
+text-align: center;
+
+padding: 30px;
+
+}
+#endingContent {
+max-width: 600px;
+}
+
+#endingTitle {
+font-size: 30px;
+
+margin-bottom: 20px;
+
+color: #d8e8f4;
+
+}
+#endingText {
+line-height: 1.7;
+
+color: #bdcbd6;
+
+}
+#restart {
+margin-top: 25px;
+
+padding: 12px 25px;
+
+border: 0;
+
+border-radius: 8px;
+
+background: #405a72;
+
+color: white;
+
+}
+/* Управление */
+
+#controls {
+position: absolute;
+
+left: 18px;
+bottom: 18px;
+
+z-index: 80;
+
+display: grid;
+
+grid-template-columns: 55px 55px 55px;
+
+grid-template-rows: 55px 55px 55px;
+
+gap: 5px;
+
+}
+.control {
+border: 1px solid #617487;
+
+background: rgba(15,22,30,.82);
+
+color: white;
+
+border-radius: 10px;
+
+font-size: 20px;
+
+}
+#up {
+grid-column: 2;
+}
+
+#left {
+grid-column: 1;
+grid-row: 2;
+}
+
+#down {
+grid-column: 2;
+grid-row: 2;
+}
+
+#right {
+grid-column: 3;
+grid-row: 2;
+}
+
+#action {
+position: absolute;
+
+right: 20px;
+bottom: 25px;
+
+z-index: 80;
+
+width: 75px;
+height: 75px;
+
+border-radius: 50%;
+
+border: 1px solid #91aabd;
+
+background: rgba(43,59,75,.92);
+
+color: white;
+
+}
+/* Фонарик */
+
+#flashlight {
+position: absolute;
+
+inset: 0;
+
+z-index: 40;
+
+pointer-events: none;
+
+background:
+    radial-gradient(
+        circle at 50% 55%,
+        transparent 0 15%,
+        rgba(0,0,0,.35) 30%,
+        rgba(0,0,0,.85) 70%
+    );
+
+}
+#scanlines {
+position: absolute;
+
+inset: 0;
+
+z-index: 200;
+
+pointer-events: none;
+
+opacity: .06;
+
+background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0 3px,
+        #fff 4px
+    );
+
+}
+</style> </head> <body> <div id="game"> <div id="moon"></div> <div class="building b1"> <div class="window" style="left:20px;top:30px"></div> </div> <div class="building b2"> <div class="window" style="left:30px;top:30px"></div> </div> <div class="building b3"> <div class="window" style="left:25px;top:40px"></div> </div> <div class="building b4"> <div class="window" style="left:30px;top:35px"></div> </div> <div id="road"></div> <div id="roadLine"></div> <div id="shop"> МАГАЗИН </div> <div id="station" class="locked"> СТАНЦИЯ </div> <div id="stranger" class="npc"></div> <div id="girl" class="npc"></div> <div id="food1" class="item food" style="left:31%;bottom:41%"> </div> <div id="food2" class="item food" style="right:31%;bottom:32%"> </div> <div id="key" class="item key" style="left:54%;bottom:53%"> </div> <div id="photo" class="item photo" style="left:25%;bottom:49%"> </div> <div id="player"></div> <div id="fog"></div> <div id="flashlight"></div> <div id="scanlines"></div> <!-- HUD --> <div id="hud"> <div class="stat"> ❤️ Здоровье: <span id="health">100</span> </div> <div class="stat"> 🍖 Голод: <span id="hunger">100</span> </div> <div class="stat"> 🍞 Еда: <span id="foodCount">0</span> </div> <div id="objective"> Цель: найти человека, который знает дорогу домой. </div> <div id="location"> 📍 Центральный район </div> </div> <!-- КВЕСТЫ --> <div id="quests"> <div>📜 ЗАДАНИЯ</div> <div id="q1" class="quest"> ☐ Найти незнакомца </div> <div id="q2" class="quest"> ☐ Найти старый ключ </div> <div id="q3" class="quest"> ☐ Найти фотографию </div> <div id="q4" class="quest"> ☐ Добраться до станции </div> <div id="q5" class="quest"> ☐ Узнать правду о городе </div> </div> <!-- ИНВЕНТАРЬ --> <div id="inventory"> <div>🎒 ИНВЕНТАРЬ</div> <div class="inventoryItem"> 🍞 Еда: <span id="invFood">0</span> </div> <div class="inventoryItem"> 🔑 Ключ: <span id="invKey">нет</span> </div> <div class="inventoryItem"> 📷 Фотография: <span id="invPhoto">нет</span> </div> <div class="inventoryItem"> 🔦 Фонарик: есть </div> </div> <!-- ДИАЛОГ --> <div id="dialog"> <div id="dialogName"> Незнакомец </div> <div id="dialogText"></div> <div id="choices"></div> </div> <!-- СООБЩЕНИЕ --> <div id="message"></div> <!-- УПРАВЛЕНИЕ --> <div id="controls"> <button class="control" id="up"> ▲ </button> <button class="control" id="left"> ◀ </button> <button class="control" id="down"> ▼ </button> <button class="control" id="right"> ▶ </button> </div> <button id="action"> E </button> <!-- КОНЦОВКА --> <div id="ending"> <div id="endingContent"> <div id="endingTitle"> Конец </div> <div id="endingText"> </div> <button id="restart"> Начать заново </button> </div> </div> </div> <script>
+/* =========================================
+СОСТОЯНИЕ
+========================================= */
+
+let state = {
+
+x: 50,
+
+y: 13,
+
+health: 100,
+
+hunger: 100,
+
+food: 0,
+
+key: false,
+
+photo: false,
+
+stranger: false,
+
+truth: false,
+
+station: false,
+
+trust: 0,
+
+ending: false
+
+};
+/* =========================================
+СОХРАНЕНИЕ
+========================================= */
+
+function saveGame() {
+
+localStorage.setItem(
+    "lostCitySave",
+    JSON.stringify(state)
+);
+
+}
+function loadGame() {
+
+const save =
+    localStorage.getItem(
+        "lostCitySave"
+    );
+
+if (!save)
+    return;
+
+try {
+
+    state =
+        JSON.parse(save);
+
+} catch {
+
+    console.log(
+        "Не удалось загрузить сохранение."
+    );
+
+}
+
+}
+/* =========================================
+ЭЛЕМЕНТЫ
+========================================= */
+
+const player =
+document.getElementById("player");
+
+const dialog =
+document.getElementById("dialog");
+
+const dialogText =
+document.getElementById("dialogText");
+
+const dialogName =
+document.getElementById("dialogName");
+
+const choices =
+document.getElementById("choices");
+
+/* =========================================
+УПРАВЛЕНИЕ
+========================================= */
+
+const keys = {
+
+up:false,
+down:false,
+left:false,
+right:false
+
+};
+/* =========================================
+ДВИЖЕНИЕ
+========================================= */
+
+function move() {
+
+const speed = .45;
+
+if(keys.up)
+    state.y += speed;
+
+if(keys.down)
+    state.y -= speed;
+
+if(keys.left)
+    state.x -= speed;
+
+if(keys.right)
+    state.x += speed;
+
+state.x =
+    Math.max(
+        4,
+        Math.min(96,state.x)
+    );
+
+state.y =
+    Math.max(
+        8,
+        Math.min(62,state.y)
+    );
+
+player.style.left =
+    state.x + "%";
+
+player.style.bottom =
+    state.y + "%";
+
+checkObjects();
+
+}
+/* =========================================
+ОБЪЕКТЫ
+========================================= */
+
+function checkObjects() {
+
+checkFood();
+
+checkKey();
+
+checkPhoto();
+
+checkStation();
+
+}
+/* =========================================
+ЕДА
+========================================= */
+
+function checkFood() {
+
+document
+.querySelectorAll(".food")
+.forEach(food => {
+
+    if(
+        food.style.display === "none"
+    )
+        return;
+
+    const rect =
+        food.getBoundingClientRect();
+
+    const gameRect =
+        document
+        .getElementById("game")
+        .getBoundingClientRect();
+
+    const x =
+        ((rect.left +
+        rect.width/2 -
+        gameRect.left) /
+        gameRect.width)*100;
+
+    const y =
+        ((gameRect.bottom -
+        rect.top) /
+        gameRect.height)*100;
+
+    const distance =
+        Math.abs(state.x-x) +
+        Math.abs(state.y-y);
+
+    if(distance < 6){
+
+        food.style.display =
+            "none";
+
+        state.food++;
+
+        showMessage(
+            "Ты нашёл еду."
+        );
+
+        updateUI();
+
+        saveGame();
+
+    }
+
+});
+
+}
+/* =========================================
+КЛЮЧ
+========================================= */
+
+function checkKey(){
+
+if(state.key)
+    return;
+
+const distance =
+    Math.abs(state.x-54) +
+    Math.abs(state.y-53);
+
+if(distance < 7){
+
+    state.key = true;
+
+    document
+    .getElementById("key")
+    .style.display = "none";
+
+    document
+    .getElementById("q2")
+    .classList.add("done");
+
+    showMessage(
+        "Ты нашёл старый железный ключ."
+    );
+
+    updateUI();
+
+    saveGame();
+
+}
+
+}
+/* =========================================
+ФОТОГРАФИЯ
+========================================= */
+
+function checkPhoto(){
+
+if(state.photo)
+    return;
+
+const distance =
+    Math.abs(state.x-25) +
+    Math.abs(state.y-49);
+
+if(distance < 7){
+
+    state.photo = true;
+
+    document
+    .getElementById("photo")
+    .style.display = "none";
+
+    document
+    .getElementById("q3")
+    .classList.add("done");
+
+    showMessage(
+        "На фотографии ты видишь самого себя..."
+    );
+
+    updateUI();
+
+    saveGame();
+
+}
+
+}
+/* =========================================
+СТАНЦИЯ
+========================================= */
+
+function checkStation(){
+
+const distance =
+    Math.abs(state.x-90) +
+    Math.abs(state.y-58);
+
+if(distance < 15){
+
+    if(!state.key){
+
+        setObjective(
+            "Станция закрыта. Нужен ключ."
+        );
+
+    }else{
+
+        setObjective(
+            "Нажми E, чтобы открыть станцию."
+        );
+
+    }
+
+}
+
+}
+/* =========================================
+ДЕЙСТВИЕ
+========================================= */
+
+function action(){
+
+const npcDistance =
+    Math.abs(state.x-66) +
+    Math.abs(state.y-39);
+
+const girlDistance =
+    Math.abs(state.x-28) +
+    Math.abs(state.y-35);
+
+const stationDistance =
+    Math.abs(state.x-90) +
+    Math.abs(state.y-58);
+
+if(npcDistance < 12){
+
+    strangerDialogue();
+
+    return;
+
+}
+
+if(girlDistance < 12){
+
+    girlDialogue();
+
+    return;
+
+}
+
+if(stationDistance < 15){
+
+    stationAction();
+
+    return;
+
+}
+
+eat();
+
+}
+/* =========================================
+НЕЗНАКОМЕЦ
+========================================= */
+
+function strangerDialogue(){
+
+openDialogue(
+    "Незнакомец"
+);
+
+if(!state.stranger){
+
+    dialogText.textContent =
+        "Я здесь уже три дня. Каждый раз, когда пытаюсь уехать, город возвращает меня обратно. Но я видел поезд. Он приходит на старую станцию.";
+
+    addChoice(
+        "Я тебе верю.",
+        () => {
+
+            state.stranger = true;
+
+            state.trust++;
+
+            document
+            .getElementById("q1")
+            .classList.add("done");
+
+            setObjective(
+                "Найди старый ключ и фотографию."
+            );
+
+            closeDialogue();
+
+            saveGame();
+
+            updateUI();
+
+        }
+    );
+
+    addChoice(
+        "Я тебе не доверяю.",
+        () => {
+
+            state.stranger = true;
+
+            state.trust--;
+
+            document
+            .getElementById("q1")
+            .classList.add("done");
+
+            setObjective(
+                "Поговори с девушкой в старом районе."
+            );
+
+            closeDialogue();
+
+            saveGame();
+
+            updateUI();
+
+        }
+    );
+
+}else{
+
+    dialogText.textContent =
+        "Станция существует. Но поезд появляется только тогда, когда город считает, что ты готов.";
+
+    addChoice(
+        "Что значит «готов»?",
+        () => {
+
+            dialogText.textContent =
+                "Тебе нужно вспомнить, кем ты был до того, как оказался здесь.";
+
+        }
+    );
+
+    addChoice(
+        "Уйти.",
+        closeDialogue
+    );
+
+}
+
+}
+/* =========================================
+ДЕВУШКА
+========================================= */
+
+function girlDialogue(){
+
+openDialogue(
+    "Девушка"
+);
+
+if(!state.photo){
+
+    dialogText.textContent =
+        "Я видела тебя раньше. Но не здесь. Найди фотографию. Тогда ты всё вспомнишь.";
+
+    addChoice(
+        "Где её искать?",
+        () => {
+
+            dialogText.textContent =
+                "В старом доме возле магазина.";
+
+        }
+    );
+
+    addChoice(
+        "Спасибо.",
+        closeDialogue
+    );
+
+}else{
+
+    dialogText.textContent =
+        "Теперь ты видишь правду. Ты уже приезжал в этот город.";
+
+    addChoice(
+        "Почему я ничего не помню?",
+        () => {
+
+            state.truth = true;
+
+            document
+            .getElementById("q5")
+            .classList.add("done");
+
+            dialogText.textContent =
+                "Потому что город забирает воспоминания у тех, кто пытается уйти.";
+
+            setObjective(
+                "Открой станцию и найди поезд."
+            );
+
+            saveGame();
+
+        }
+    );
+
+    addChoice(
+        "Мне нужно идти.",
+        closeDialogue
+    );
+
+}
+
+}
+/* =========================================
+СТАНЦИЯ
+========================================= */
+
+function stationAction(){
+
+if(!state.key){
+
+    showMessage(
+        "Дверь заперта."
+    );
+
+    return;
+
+}
+
+if(!state.truth){
+
+    showMessage(
+        "Дверь открылась, но внутри ничего нет. Ты ещё не знаешь правду."
+    );
+
+    return;
+
+}
+
+finishGame();
+
+}
+/* =========================================
+ДИАЛОГ
+========================================= */
+
+function openDialogue(name){
+
+dialogName.textContent =
+    name;
+
+dialogText.textContent =
+    "";
+
+choices.innerHTML =
+    "";
+
+dialog.style.display =
+    "block";
+
+}
+function addChoice(
+text,
+callback
+){
+
+const button =
+    document.createElement(
+        "button"
+    );
+
+button.className =
+    "choice";
+
+button.textContent =
+    text;
+
+button.onclick =
+    callback;
+
+choices.appendChild(
+    button
+);
+
+}
+function closeDialogue(){
+
+dialog.style.display =
+    "none";
+
+}
+/* =========================================
+ЕДА
+========================================= */
+
+function eat(){
+
+if(state.food <= 0){
+
+    showMessage(
+        "У тебя нет еды."
+    );
+
+    return;
+
+}
+
+state.food--;
+
+state.hunger =
+    Math.min(
+        100,
+        state.hunger+30
+    );
+
+updateUI();
+
+saveGame();
+
+}
+/* =========================================
+UI
+========================================= */
+
+function setObjective(text){
+
+document
+.getElementById("objective")
+.textContent =
+    text;
+
+}
+function updateUI(){
+
+document
+.getElementById("health")
+.textContent =
+    Math.floor(state.health);
+
+document
+.getElementById("hunger")
+.textContent =
+    Math.floor(state.hunger);
+
+document
+.getElementById("foodCount")
+.textContent =
+    state.food;
+
+document
+.getElementById("invFood")
+.textContent =
+    state.food;
+
+document
+.getElementById("invKey")
+.textContent =
+    state.key
+    ? "есть"
+    : "нет";
+
+document
+.getElementById("invPhoto")
+.textContent =
+    state.photo
+    ? "есть"
+    : "нет";
+
+}
+/* =========================================
+ГОЛОД
+========================================= */
+
+function hungerSystem(){
+
+state.hunger -= .012;
+
+if(state.hunger < 0){
+
+    state.hunger = 0;
+
+    state.health -= .025;
+
+}
+
+if(state.health <= 0){
+
+    showMessage(
+        "Ты потерял сознание..."
+    );
+
+    state.health = 100;
+
+    state.hunger = 50;
+
+    state.x = 50;
+
+    state.y = 13;
+
+}
+
+updateUI();
+
+}
+/* =========================================
+СЛУЧАЙНЫЕ СОБЫТИЯ
+========================================= */
+
+function strangeEvents(){
+
+if(
+    Math.random() > .003
+)
+    return;
+
+const events = [
+
+    "Ты слышишь шаги за спиной.",
+
+    "Все фонари погасли на несколько секунд.",
+
+    "На секунду тебе показалось, что ты увидел самого себя.",
+
+    "Вдалеке раздался гудок поезда.",
+
+    "Кто-то прошептал твоё имя."
+
+];
+
+const event =
+    events[
+        Math.floor(
+            Math.random()*events.length
+        )
+    ];
+
+showMessage(event);
+
+}
+/* =========================================
+СООБЩЕНИЕ
+========================================= */
+
+function showMessage(text){
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+message.textContent =
+    text;
+
+message.style.display =
+    "block";
+
+setTimeout(
+    () => {
+
+        message.style.display =
+            "none";
+
+    },
+    2500
+);
+
+}
+/* =========================================
+КОНЦОВКА
+========================================= */
+
+function finishGame(){
+
+state.ending = true;
+
+saveGame();
+
+const ending =
+    document.getElementById(
+        "ending"
+    );
+
+const title =
+    document.getElementById(
+        "endingTitle"
+    );
+
+const text =
+    document.getElementById(
+        "endingText"
+    );
+
+ending.style.display =
+    "flex";
+
+if(state.trust > 0){
+
+    title.textContent =
+        "🚂 Дорога домой";
+
+    text.textContent =
+        "Поезд наконец прибывает. Ты садишься в последний вагон. За окном город исчезает в тумане. Ты не знаешь, действительно ли вернулся домой... но впервые за несколько дней чувствуешь, что город отпустил тебя.";
+
+}else{
+
+    title.textContent =
+        "🌑 Город помнит тебя";
+
+    text.textContent =
+        "Ты садишься в поезд один. Когда поезд останавливается, за дверями снова оказывается тот же самый город. Возможно, ты никогда не уезжал. Возможно, ты просто забыл, что уже возвращался.";
+
+}
+
+}
+/* =========================================
+НОВАЯ ИГРА
+========================================= */
+
+document
+.getElementById("restart")
+.addEventListener(
+"click",
+() => {
+
+    localStorage.removeItem(
+        "lostCitySave"
+    );
+
+    location.reload();
+
+}
+
+);
+/* =========================================
+КНОПКИ
+========================================= */
+
+function bindButton(
+id,
+direction
+){
+
+const button =
+    document.getElementById(id);
+
+button.addEventListener(
+    "touchstart",
+    e => {
+
+        e.preventDefault();
+
+        keys[direction] = true;
+
+    }
+);
+
+button.addEventListener(
+    "touchend",
+    e => {
+
+        e.preventDefault();
+
+        keys[direction] = false;
+
+    }
+);
+
+button.addEventListener(
+    "mousedown",
+    () => {
+
+        keys[direction] = true;
+
+    }
+);
+
+button.addEventListener(
+    "mouseup",
+    () => {
+
+        keys[direction] = false;
+
+    }
+);
+
+}
+bindButton("up","up");
+bindButton("down","down");
+bindButton("left","left");
+bindButton("right","right");
+
+document
+.getElementById("action")
+.addEventListener(
+"click",
+action
+);
+
+/* =========================================
+КЛАВИАТУРА
+========================================= */
+
+document.addEventListener(
+"keydown",
+e => {
+
+    if(e.key === "w")
+        keys.up = true;
+
+    if(e.key === "s")
+        keys.down = true;
+
+    if(e.key === "a")
+        keys.left = true;
+
+    if(e.key === "d")
+        keys.right = true;
+
+    if(
+        e.key.toLowerCase()
+        === "e"
+    )
+        action();
+
+    if(e.key === " ")
+        eat();
+
+}
+
+);
+document.addEventListener(
+"keyup",
+e => {
+
+    if(e.key === "w")
+        keys.up = false;
+
+    if(e.key === "s")
+        keys.down = false;
+
+    if(e.key === "a")
+        keys.left = false;
+
+    if(e.key === "d")
+        keys.right = false;
+
+}
+
+);
+/* =========================================
+ЗАПУСК
+========================================= */
+
+loadGame();
+
+updateUI();
+
+function loop(){
+
+move();
+
+hungerSystem();
+
+strangeEvents();
+
+requestAnimationFrame(
+    loop
+);
+
+}
+loop();
+
+</script> </body> </html>
+LostCity/
+├── index.html
+├── style.css
+├── game.js
+├── maps.js
+├── player.js
+├── quests.js
+├── dialogue.js
+├── save.js
+└── assets/
+
+                 🌲 ЛЕС
+                   │
+                   │
+🏥 БОЛЬНИЦА ─── 🏙️ ЦЕНТР ─── 🏚️ СТАРЫЙ РАЙОН
+                   │
+                   │
+                🏪 МАГАЗИН
+                   │
+                   │
+              🚂 СТАНЦИЯ
