@@ -59,3 +59,1515 @@
 <button id="action">E</button>
 
 </div> <script> const player = document.getElementById("player"); const npc = document.getElementById("npc"); const hungerText = document.getElementById("hunger"); const foodText = document.getElementById("foodCount"); const objective = document.getElementById("objective"); const dialog = document.getElementById("dialog"); const dialogText = document.getElementById("dialogText"); const closeDialog = document.getElementById("closeDialog"); let playerX = 50; let playerY = 13; let hunger = 100; let health = 100; let foodCount = 0; let npcFound = false; const keys = { up: false, down: false, left: false, right: false }; function updatePlayer() { const speed = 0.45; if (keys.up) playerY += speed; if (keys.down) playerY -= speed; if (keys.left) playerX -= speed; if (keys.right) playerX += speed; playerX = Math.max(5, Math.min(95, playerX)); playerY = Math.max(8, Math.min(60, playerY)); player.style.left = playerX + "%"; player.style.bottom = playerY + "%"; checkObjects(); } function checkObjects() { const distanceToNpc = Math.abs(playerX - 67) + Math.abs(playerY - 38); if (distanceToNpc < 10) { npcFound = true; objective.textContent = "Цель: нажми E, чтобы поговорить с незнакомцем."; } document.querySelectorAll(".food").forEach(food => { if (food.style.display === "none") return; const rect = food.getBoundingClientRect(); const gameRect = document.getElementById("game").getBoundingClientRect(); const foodX = ((rect.left + rect.width / 2 - gameRect.left) / gameRect.width) * 100; const foodY = ((gameRect.bottom - rect.top) / gameRect.height) * 100; const distance = Math.abs(playerX - foodX) + Math.abs(playerY - foodY); if (distance < 7) { food.style.display = "none"; foodCount++; foodText.textContent = foodCount; objective.textContent = "Ты нашёл еду. Продолжай исследовать город."; } }); } function talkToNpc() { const distance = Math.abs(playerX - 67) + Math.abs(playerY - 38); if (distance > 12) return; dialog.style.display = "block"; if (!npcFound) { dialogText.textContent = "Нужно подойти ближе."; return; } dialogText.textContent = "Я не знаю, как сюда попал. Но видел старую железнодорожную станцию на севере. Возможно, там есть способ выбраться."; objective.textContent = "Новая цель: найти старую железнодорожную станцию."; npcFound = true; } function eatFood() { if (foodCount <= 0) return; foodCount--; hunger = Math.min(100, hunger + 25); hungerText.textContent = hunger; foodText.textContent = foodCount; } function gameLoop() { updatePlayer(); hunger -= 0.01; if (hunger < 0) { hunger = 0; health -= 0.02; } hungerText.textContent = Math.floor(hunger); document.getElementById("health").textContent = Math.floor(health); requestAnimationFrame(gameLoop); } function bindButton(id, direction) { const button = document.getElementById(id); button.addEventListener("touchstart", e => { e.preventDefault(); keys[direction] = true; }); button.addEventListener("touchend", e => { e.preventDefault(); keys[direction] = false; }); button.addEventListener("mousedown", () => { keys[direction] = true; }); button.addEventListener("mouseup", () => { keys[direction] = false; }); button.addEventListener("mouseleave", () => { keys[direction] = false; }); } bindButton("up", "up"); bindButton("down", "down"); bindButton("left", "left"); bindButton("right", "right"); document.getElementById("action").addEventListener("click", () => { if (npcFound) { talkToNpc(); } else { eatFood(); } }); document.addEventListener("keydown", e => { if (e.key === "w") keys.up = true; if (e.key === "s") keys.down = true; if (e.key === "a") keys.left = true; if (e.key === "d") keys.right = true; if (e.key.toLowerCase() === "e") { talkToNpc(); } if (e.key === " ") { eatFood(); } }); document.addEventListener("keyup", e => { if (e.key === "w") keys.up = false; if (e.key === "s") keys.down = false; if (e.key === "a") keys.left = false; if (e.key === "d") keys.right = false; }); closeDialog.addEventListener("click", () => { dialog.style.display = "none"; }); gameLoop(); </script> </body> </html>
+DOCTYPE html> <html lang="ru"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <title>Город без имени</title> <style>
+{
+box-sizing: border-box;
+user-select: none;
+-webkit-user-select: none;
+}
+body {
+margin: 0;
+overflow: hidden;
+background: #030509;
+color: white;
+font-family: Arial, sans-serif;
+}
+#game {
+position: relative;
+width: 100vw;
+height: 100vh;
+overflow: hidden;
+
+background:
+    radial-gradient(
+        circle at 50% 25%,
+        #263241 0%,
+        #111721 35%,
+        #030509 85%
+    );
+
+}
+/* =========================
+НЕБО
+========================= */
+
+#moon {
+position: absolute;
+width: 80px;
+height: 80px;
+top: 8%;
+right: 15%;
+
+border-radius: 50%;
+
+background: #d7e3e5;
+
+box-shadow:
+    0 0 30px #9bbbc8,
+    0 0 80px rgba(150,200,220,.3);
+
+}
+/* =========================
+ГОРОД
+========================= */
+
+.building {
+position: absolute;
+
+background:
+    linear-gradient(
+        to bottom,
+        #161d27,
+        #080b10
+    );
+
+border: 2px solid #293442;
+
+box-shadow:
+    0 0 30px #000;
+
+}
+.window {
+position: absolute;
+
+width: 10px;
+height: 15px;
+
+background: #b99a4b;
+
+opacity: .35;
+
+box-shadow:
+    20px 0 #b99a4b,
+    40px 0 #b99a4b,
+    60px 0 #b99a4b,
+    0 35px #b99a4b,
+    20px 35px #b99a4b,
+    40px 35px #b99a4b,
+    60px 35px #b99a4b;
+
+}
+.b1 {
+width: 130px;
+height: 260px;
+
+left: 2%;
+bottom: 32%;
+
+}
+.b2 {
+width: 170px;
+height: 190px;
+
+left: 19%;
+bottom: 32%;
+
+}
+.b3 {
+width: 130px;
+height: 300px;
+
+right: 20%;
+bottom: 32%;
+
+}
+.b4 {
+width: 180px;
+height: 230px;
+
+right: 1%;
+bottom: 32%;
+
+}
+/* =========================
+ДОРОГА
+========================= */
+
+#road {
+position: absolute;
+
+left: 50%;
+bottom: -5%;
+
+transform: translateX(-50%);
+
+width: 65%;
+height: 75%;
+
+background:
+    linear-gradient(
+        to right,
+        #15191e,
+        #20252b,
+        #15191e
+    );
+
+clip-path:
+    polygon(
+        28% 0,
+        72% 0,
+        100% 100%,
+        0 100%
+    );
+
+}
+#roadLine {
+position: absolute;
+
+left: 50%;
+bottom: 0;
+
+transform: translateX(-50%);
+
+width: 7px;
+height: 72%;
+
+background:
+    repeating-linear-gradient(
+        to bottom,
+        #c8b34d 0px,
+        #c8b34d 35px,
+        transparent 35px,
+        transparent 75px
+    );
+
+opacity: .35;
+
+}
+/* =========================
+ТУМАН
+========================= */
+
+#fog {
+position: absolute;
+
+inset: 0;
+
+pointer-events: none;
+
+background:
+    radial-gradient(
+        ellipse at center,
+        transparent 15%,
+        rgba(150,170,180,.08) 45%,
+        rgba(0,0,0,.8) 100%
+    );
+
+}
+/* =========================
+ИГРОК
+========================= */
+
+#player {
+
+position: absolute;
+
+width: 30px;
+height: 48px;
+
+left: 50%;
+bottom: 12%;
+
+transform: translateX(-50%);
+
+background: #d9dde0;
+
+border-radius:
+    12px 12px 6px 6px;
+
+box-shadow:
+    0 0 18px #91b8d9;
+
+z-index: 10;
+
+}
+/* =========================
+NPC
+========================= */
+
+.npc {
+
+position: absolute;
+
+width: 30px;
+height: 48px;
+
+border-radius:
+    12px 12px 6px 6px;
+
+z-index: 8;
+
+}
+#npc1 {
+
+left: 66%;
+bottom: 40%;
+
+background: #70417b;
+
+box-shadow:
+    0 0 20px #b76cc7;
+
+}
+#npc2 {
+
+left: 28%;
+bottom: 35%;
+
+background: #3d647c;
+
+box-shadow:
+    0 0 20px #5b9ac1;
+
+}
+/* =========================
+МАГАЗИН
+========================= */
+
+#shop {
+
+position: absolute;
+
+left: 5%;
+bottom: 45%;
+
+width: 115px;
+height: 55px;
+
+background: #241d16;
+
+border:
+    2px solid #8a6d42;
+
+box-shadow:
+    0 0 20px #000;
+
+}
+#shop::after {
+
+content: "МАГАЗИН";
+
+position: absolute;
+
+top: 12px;
+left: 12px;
+
+color: #d4b873;
+
+font-size: 13px;
+
+letter-spacing: 2px;
+
+}
+/* =========================
+СТАНЦИЯ
+========================= */
+
+#station {
+
+position: absolute;
+
+right: 8%;
+top: 18%;
+
+width: 170px;
+height: 70px;
+
+background: #151b22;
+
+border:
+    2px solid #475665;
+
+box-shadow:
+    0 0 25px #000;
+
+}
+#station::after {
+
+content: "СТАНЦИЯ";
+
+position: absolute;
+
+top: 22px;
+left: 30px;
+
+color: #aebcca;
+
+font-size: 16px;
+
+letter-spacing: 3px;
+
+}
+/* =========================
+ПРЕДМЕТЫ
+========================= */
+
+.item {
+
+position: absolute;
+
+width: 24px;
+height: 24px;
+
+border-radius: 50%;
+
+z-index: 9;
+
+}
+.food {
+
+background: #d79532;
+
+box-shadow:
+    0 0 15px #ffb83d;
+
+}
+.key {
+
+background: #c5c8ca;
+
+box-shadow:
+    0 0 18px #e7f3ff;
+
+}
+/* =========================
+HUD
+========================= */
+
+#hud {
+
+position: absolute;
+
+top: 12px;
+left: 12px;
+
+z-index: 50;
+
+min-width: 210px;
+
+padding: 13px;
+
+border-radius: 10px;
+
+background:
+    rgba(0,0,0,.65);
+
+border:
+    1px solid #344352;
+
+backdrop-filter:
+    blur(6px);
+
+}
+.stat {
+margin: 5px 0;
+}
+
+#objective {
+
+margin-top: 10px;
+
+color: #b9d7f3;
+
+font-size: 13px;
+
+line-height: 1.4;
+
+}
+#location {
+
+margin-top: 8px;
+
+color: #7f94a8;
+
+font-size: 12px;
+
+}
+/* =========================
+ИНВЕНТАРЬ
+========================= */
+
+#inventory {
+
+position: absolute;
+
+right: 12px;
+top: 12px;
+
+z-index: 50;
+
+padding: 12px;
+
+background:
+    rgba(0,0,0,.65);
+
+border:
+    1px solid #344352;
+
+border-radius: 10px;
+
+min-width: 150px;
+
+}
+.inventoryItem {
+margin-top: 7px;
+
+color: #cdd8e3;
+
+}
+/* =========================
+ДИАЛОГ
+========================= */
+
+#dialog {
+
+display: none;
+
+position: absolute;
+
+z-index: 100;
+
+left: 50%;
+bottom: 12%;
+
+transform:
+    translateX(-50%);
+
+width:
+    min(90%, 600px);
+
+padding: 20px;
+
+border-radius: 12px;
+
+background:
+    rgba(4,7,11,.96);
+
+border:
+    1px solid #566a7e;
+
+box-shadow:
+    0 0 40px #000;
+
+}
+#dialogName {
+
+color: #a9cbed;
+
+font-weight: bold;
+
+margin-bottom: 10px;
+
+}
+#dialogText {
+
+line-height: 1.6;
+
+color: #e1e7ec;
+
+}
+#closeDialog {
+
+margin-top: 15px;
+
+padding: 10px 18px;
+
+border: 0;
+
+border-radius: 7px;
+
+background: #30465e;
+
+color: white;
+
+}
+/* =========================
+УПРАВЛЕНИЕ
+========================= */
+
+#controls {
+
+position: absolute;
+
+z-index: 80;
+
+left: 18px;
+bottom: 20px;
+
+display: grid;
+
+grid-template-columns:
+    55px 55px 55px;
+
+grid-template-rows:
+    55px 55px 55px;
+
+gap: 5px;
+
+}
+.control {
+
+border:
+    1px solid #627487;
+
+background:
+    rgba(15,22,30,.8);
+
+color: white;
+
+border-radius: 10px;
+
+font-size: 20px;
+
+}
+#up {
+grid-column: 2;
+}
+
+#left {
+grid-column: 1;
+grid-row: 2;
+}
+
+#down {
+grid-column: 2;
+grid-row: 2;
+}
+
+#right {
+grid-column: 3;
+grid-row: 2;
+}
+
+#action {
+
+position: absolute;
+
+right: 20px;
+bottom: 30px;
+
+z-index: 80;
+
+width: 75px;
+height: 75px;
+
+border-radius: 50%;
+
+border:
+    1px solid #90a8bd;
+
+background:
+    rgba(42,57,73,.9);
+
+color: white;
+
+font-size: 16px;
+
+}
+/* =========================
+ФОНАРИК
+========================= */
+
+#flashlight {
+
+position: absolute;
+
+inset: 0;
+
+z-index: 40;
+
+pointer-events: none;
+
+background:
+    radial-gradient(
+        circle at 50% 55%,
+        transparent 0%,
+        transparent 15%,
+        rgba(0,0,0,.35) 30%,
+        rgba(0,0,0,.82) 65%
+    );
+
+}
+/* =========================
+СООБЩЕНИЯ
+========================= */
+
+#message {
+
+display: none;
+
+position: absolute;
+
+z-index: 120;
+
+left: 50%;
+top: 42%;
+
+transform:
+    translate(-50%,-50%);
+
+padding: 15px 25px;
+
+background:
+    rgba(0,0,0,.85);
+
+border:
+    1px solid #566a7e;
+
+border-radius: 8px;
+
+color: #dbe8f3;
+
+text-align: center;
+
+}
+/* =========================
+ЭКРАН
+========================= */
+
+#scanlines {
+
+position: absolute;
+
+inset: 0;
+
+pointer-events: none;
+
+z-index: 200;
+
+opacity: .07;
+
+background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        #fff 4px
+    );
+
+}
+</style> </head> <body> <div id="game">
+<div id="moon"></div>
+
+<!-- ГОРОД -->
+
+<div class="building b1">
+    <div class="window" style="left:20px;top:30px"></div>
+</div>
+
+<div class="building b2">
+    <div class="window" style="left:30px;top:35px"></div>
+</div>
+
+<div class="building b3">
+    <div class="window" style="left:25px;top:40px"></div>
+</div>
+
+<div class="building b4">
+    <div class="window" style="left:35px;top:35px"></div>
+</div>
+
+<div id="road"></div>
+<div id="roadLine"></div>
+
+<!-- МЕСТА -->
+
+<div id="shop"></div>
+
+<div id="station"></div>
+
+<!-- NPC -->
+
+<div id="npc1" class="npc"></div>
+
+<div id="npc2" class="npc"></div>
+
+<!-- ЕДА -->
+
+<div
+    id="food1"
+    class="item food"
+    style="left:32%;bottom:42%;">
+</div>
+
+<div
+    id="food2"
+    class="item food"
+    style="right:31%;bottom:32%;">
+</div>
+
+<!-- КЛЮЧ -->
+
+<div
+    id="key"
+    class="item key"
+    style="left:54%;bottom:54%;">
+</div>
+
+<!-- ИГРОК -->
+
+<div id="player"></div>
+
+<div id="fog"></div>
+
+<div id="flashlight"></div>
+
+<div id="scanlines"></div>
+
+<!-- HUD -->
+
+<div id="hud">
+
+    <div class="stat">
+        ❤️ Здоровье:
+        <span id="health">100</span>
+    </div>
+
+    <div class="stat">
+        🍖 Голод:
+        <span id="hunger">100</span>
+    </div>
+
+    <div class="stat">
+        🍞 Еда:
+        <span id="foodCount">0</span>
+    </div>
+
+    <div id="objective">
+        Цель: найти человека, который знает дорогу домой.
+    </div>
+
+    <div id="location">
+        📍 Район: Центральный
+    </div>
+
+</div>
+
+<!-- ИНВЕНТАРЬ -->
+
+<div id="inventory">
+
+    <div>🎒 Инвентарь</div>
+
+    <div class="inventoryItem">
+        🍞 Еда:
+        <span id="invFood">0</span>
+    </div>
+
+    <div class="inventoryItem">
+        🔑 Старый ключ:
+        <span id="invKey">нет</span>
+    </div>
+
+    <div class="inventoryItem">
+        🔦 Фонарик:
+        есть
+    </div>
+
+</div>
+
+<!-- ДИАЛОГ -->
+
+<div id="dialog">
+
+    <div id="dialogName">
+        Незнакомец
+    </div>
+
+    <div id="dialogText"></div>
+
+    <button id="closeDialog">
+        Закрыть
+    </button>
+
+</div>
+
+<!-- СООБЩЕНИЕ -->
+
+<div id="message"></div>
+
+<!-- УПРАВЛЕНИЕ -->
+
+<div id="controls">
+
+    <button class="control" id="up">
+        ▲
+    </button>
+
+    <button class="control" id="left">
+        ◀
+    </button>
+
+    <button class="control" id="down">
+        ▼
+    </button>
+
+    <button class="control" id="right">
+        ▶
+    </button>
+
+</div>
+
+<button id="action">
+    E
+</button>
+
+</div> <script>
+/* ==========================================
+СОСТОЯНИЕ ИГРЫ
+========================================== */
+const player =
+document.getElementById("player");
+
+let playerX = 50;
+let playerY = 13;
+
+let hunger = 100;
+let health = 100;
+
+let foodCount = 0;
+
+let hasKey = false;
+let talkedToStranger = false;
+let stationUnlocked = false;
+
+let flashlightOn = true;
+
+let strangeEventTimer = 0;
+
+/* ==========================================
+УПРАВЛЕНИЕ
+========================================== */
+
+const keys = {
+
+up: false,
+down: false,
+left: false,
+right: false
+
+};
+/* ==========================================
+ДВИЖЕНИЕ
+========================================== */
+
+function movePlayer() {
+
+const speed = 0.45;
+
+if (keys.up)
+    playerY += speed;
+
+if (keys.down)
+    playerY -= speed;
+
+if (keys.left)
+    playerX -= speed;
+
+if (keys.right)
+    playerX += speed;
+
+playerX =
+    Math.max(
+        4,
+        Math.min(96, playerX)
+    );
+
+playerY =
+    Math.max(
+        8,
+        Math.min(62, playerY)
+    );
+
+player.style.left =
+    playerX + "%";
+
+player.style.bottom =
+    playerY + "%";
+
+checkObjects();
+updateLocation();
+
+}
+/* ==========================================
+ЛОКАЦИЯ
+========================================== */
+
+function updateLocation() {
+
+let location = "Центральный";
+
+if (playerX < 30)
+    location = "Старый район";
+
+if (playerX > 70)
+    location = "Северный район";
+
+if (playerY > 50)
+    location = "Главная улица";
+
+if (playerY < 20)
+    location = "Южный район";
+
+document.getElementById(
+    "location"
+).textContent =
+    "📍 Район: " + location;
+
+}
+/* ==========================================
+ПРОВЕРКА ОБЪЕКТОВ
+========================================== */
+
+function checkObjects() {
+
+checkFood();
+
+checkKey();
+
+checkNPC();
+
+checkStation();
+
+}
+/* ==========================================
+ЕДА
+========================================== */
+
+function checkFood() {
+
+document
+    .querySelectorAll(".food")
+    .forEach(food => {
+
+        if (food.style.display === "none")
+            return;
+
+        const rect =
+            food.getBoundingClientRect();
+
+        const gameRect =
+            document
+            .getElementById("game")
+            .getBoundingClientRect();
+
+        const x =
+            ((rect.left +
+            rect.width / 2 -
+            gameRect.left) /
+            gameRect.width) * 100;
+
+        const y =
+            ((gameRect.bottom -
+            rect.top) /
+            gameRect.height) * 100;
+
+        const distance =
+            Math.abs(playerX - x) +
+            Math.abs(playerY - y);
+
+        if (distance < 6) {
+
+            food.style.display =
+                "none";
+
+            foodCount++;
+
+            updateInventory();
+
+            showMessage(
+                "Ты нашёл еду."
+            );
+        }
+
+    });
+
+}
+/* ==========================================
+КЛЮЧ
+========================================== */
+
+function checkKey() {
+
+if (hasKey)
+    return;
+
+const key =
+    document.getElementById("key");
+
+const distance =
+    Math.abs(playerX - 54) +
+    Math.abs(playerY - 54);
+
+if (distance < 7) {
+
+    hasKey = true;
+
+    key.style.display =
+        "none";
+
+    updateInventory();
+
+    showMessage(
+        "Ты нашёл старый железный ключ."
+    );
+
+    objective.textContent =
+        "Цель: узнать, что открывает ключ.";
+}
+
+}
+/* ==========================================
+NPC
+========================================== */
+
+function checkNPC() {
+
+const distance =
+    Math.abs(playerX - 66) +
+    Math.abs(playerY - 40);
+
+if (distance < 9) {
+
+    objective.textContent =
+        "Цель: нажми E, чтобы поговорить.";
+
+}
+
+}
+/* ==========================================
+СТАНЦИЯ
+========================================== */
+
+function checkStation() {
+
+const distance =
+    Math.abs(playerX - 90) +
+    Math.abs(playerY - 58);
+
+if (distance < 15) {
+
+    if (!hasKey) {
+
+        objective.textContent =
+            "Станция закрыта. Нужен ключ.";
+
+    } else {
+
+        objective.textContent =
+            "У тебя есть ключ. Возможно, он открывает станцию.";
+
+    }
+
+}
+
+}
+/* ==========================================
+ДИАЛОГ
+========================================== */
+
+function talk() {
+
+const distance =
+    Math.abs(playerX - 66) +
+    Math.abs(playerY - 40);
+
+if (distance > 12)
+    return;
+
+const dialog =
+    document.getElementById("dialog");
+
+const text =
+    document.getElementById("dialogText");
+
+dialog.style.display =
+    "block";
+
+if (!talkedToStranger) {
+
+    talkedToStranger = true;
+
+    text.textContent =
+        "Я проснулся здесь три дня назад. Каждый раз, когда пытаюсь уйти, улицы приводят меня обратно. Но я видел поезд возле старой станции. Возможно, он знает путь наружу.";
+
+    objective.textContent =
+        "Цель: найти старую железнодорожную станцию.";
+
+} else {
+
+    text.textContent =
+        "Не доверяй людям, которые появляются после полуночи. Они не всегда люди.";
+
+}
+
+}
+/* ==========================================
+ИНВЕНТАРЬ
+========================================== */
+
+function updateInventory() {
+
+document.getElementById(
+    "foodCount"
+).textContent =
+    foodCount;
+
+document.getElementById(
+    "invFood"
+).textContent =
+    foodCount;
+
+document.getElementById(
+    "invKey"
+).textContent =
+    hasKey ? "есть" : "нет";
+
+}
+/* ==========================================
+ЕДА
+========================================== */
+
+function eatFood() {
+
+if (foodCount <= 0) {
+
+    showMessage(
+        "У тебя нет еды."
+    );
+
+    return;
+}
+
+foodCount--;
+
+hunger =
+    Math.min(
+        100,
+        hunger + 30
+    );
+
+updateInventory();
+
+showMessage(
+    "Ты съел найденную еду."
+);
+
+}
+/* ==========================================
+ФОНАРИК
+========================================== */
+
+function toggleFlashlight() {
+
+flashlightOn =
+    !flashlightOn;
+
+const flashlight =
+    document.getElementById(
+        "flashlight"
+    );
+
+if (flashlightOn) {
+
+    flashlight.style.background =
+        "radial-gradient(circle at 50% 55%, transparent 0%, transparent 15%, rgba(0,0,0,.35) 30%, rgba(0,0,0,.82) 65%)";
+
+} else {
+
+    flashlight.style.background =
+        "rgba(0,0,0,.55)";
+
+}
+
+}
+/* ==========================================
+СООБЩЕНИЯ
+========================================== */
+
+function showMessage(text) {
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+message.textContent =
+    text;
+
+message.style.display =
+    "block";
+
+setTimeout(() => {
+
+    message.style.display =
+        "none";
+
+}, 2200);
+
+}
+/* ==========================================
+СТРАННЫЕ СОБЫТИЯ
+========================================== */
+
+function strangeEvent() {
+
+if (Math.random() > 0.004)
+    return;
+
+const messages = [
+
+    "Тебе показалось, что кто-то прошёл за спиной.",
+
+    "На секунду все фонари погасли.",
+
+    "Ты слышишь поезд. Но станции рядом нет.",
+
+    "Вдалеке кто-то произнёс твоё имя.",
+
+    "Телефон в кармане начинает звонить..."
+
+];
+
+const random =
+    messages[
+        Math.floor(
+            Math.random() *
+            messages.length
+        )
+    ];
+
+showMessage(random);
+
+}
+/* ==========================================
+ГОЛОД
+========================================== */
+
+function hungerSystem() {
+
+hunger -= 0.015;
+
+if (hunger < 0) {
+
+    hunger = 0;
+
+    health -= 0.02;
+
+}
+
+document.getElementById(
+    "hunger"
+).textContent =
+    Math.floor(hunger);
+
+document.getElementById(
+    "health"
+).textContent =
+    Math.floor(health);
+
+if (health <= 0) {
+
+    showMessage(
+        "Ты потерял сознание..."
+    );
+
+    health = 100;
+    hunger = 50;
+    playerX = 50;
+    playerY = 13;
+
+}
+
+}
+/* ==========================================
+КНОПКИ ТЕЛЕФОНА
+========================================== */
+
+function bindButton(
+id,
+direction
+) {
+
+const button =
+    document.getElementById(id);
+
+button.addEventListener(
+    "touchstart",
+    event => {
+
+        event.preventDefault();
+
+        keys[direction] = true;
+
+    }
+);
+
+button.addEventListener(
+    "touchend",
+    event => {
+
+        event.preventDefault();
+
+        keys[direction] = false;
+
+    }
+);
+
+button.addEventListener(
+    "mousedown",
+    () => {
+
+        keys[direction] = true;
+
+    }
+);
+
+button.addEventListener(
+    "mouseup",
+    () => {
+
+        keys[direction] = false;
+
+    }
+);
+
+button.addEventListener(
+    "mouseleave",
+    () => {
+
+        keys[direction] = false;
+
+    }
+);
+
+}
+bindButton("up","up");
+bindButton("down","down");
+bindButton("left","left");
+bindButton("right","right");
+
+/* ==========================================
+КНОПКА ДЕЙСТВИЯ
+========================================== */
+
+document
+.getElementById("action")
+.addEventListener(
+"click",
+() => {
+
+    const npcDistance =
+        Math.abs(playerX - 66) +
+        Math.abs(playerY - 40);
+
+    if (npcDistance < 12) {
+
+        talk();
+
+    } else {
+
+        eatFood();
+
+    }
+
+}
+
+);
+/* ==========================================
+КЛАВИАТУРА
+========================================== */
+
+document.addEventListener(
+"keydown",
+event => {
+
+    if (event.key === "w")
+        keys.up = true;
+
+    if (event.key === "s")
+        keys.down = true;
+
+    if (event.key === "a")
+        keys.left = true;
+
+    if (event.key === "d")
+        keys.right = true;
+
+    if (
+        event.key.toLowerCase()
+        === "e"
+    )
+        talk();
+
+    if (
+        event.key.toLowerCase()
+        === "f"
+    )
+        toggleFlashlight();
+
+    if (event.key === " ")
+        eatFood();
+
+}
+
+);
+document.addEventListener(
+"keyup",
+event => {
+
+    if (event.key === "w")
+        keys.up = false;
+
+    if (event.key === "s")
+        keys.down = false;
+
+    if (event.key === "a")
+        keys.left = false;
+
+    if (event.key === "d")
+        keys.right = false;
+
+}
+
+);
+/* ==========================================
+ДИАЛОГ
+========================================== */
+
+document
+.getElementById("closeDialog")
+.addEventListener(
+"click",
+() => {
+
+    document
+    .getElementById("dialog")
+    .style.display =
+        "none";
+
+}
+
+);
+/* ==========================================
+ОСНОВНОЙ ЦИКЛ
+========================================== */
+
+function gameLoop() {
+
+movePlayer();
+
+hungerSystem();
+
+strangeEvent();
+
+requestAnimationFrame(
+    gameLoop
+);
+
+}
+updateInventory();
+
+gameLoop();
+
+</script> </body> </html>
