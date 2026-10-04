@@ -1,0 +1,313 @@
+)
+    keys.right = true;
+
+});
+
+document.addEventListener("keyup", e => {
+
+  if (e.key === "ArrowUp" || e.key === "w")
+    keys.up = false;
+
+  if (e.key === "ArrowDown" || e.key === "s")
+    keys.down = false;
+
+  if (e.key === "ArrowLeft" || e.key === "a")
+    keys.left = false;
+
+  if (e.key === "ArrowRight" || e.key === "d")
+    keys.right = false;
+
+});
+
+const Alina = {
+  x: W - 150,
+  y: 190
+};
+
+const Post = {
+  x: 140,
+  y: H - 160
+};
+
+const Shop = {
+  x: 140,
+  y: 120
+};
+
+function distance(a,b) {
+  return Math.hypot(
+    a.x - b.x,
+    a.y - b.y
+  );
+}
+
+function message(text) {
+
+  const box =
+    document.getElementById("message");
+
+  box.textContent = text;
+  box.style.display = "block";
+
+  clearTimeout(window.messageTimer);
+
+  window.messageTimer =
+    setTimeout(() => {
+      box.style.display = "none";
+    }, 3000);
+}
+
+function updateInterface() {
+
+  document.getElementById("money").textContent =
+    save.money;
+
+  document.getElementById("xp").textContent =
+    save.xp;
+
+  document.getElementById("level").textContent =
+    save.level;
+
+  const quest =
+    document.getElementById("questText");
+
+  if (save.quest === 0) {
+
+    quest.textContent =
+      "Подойди к Алине возле кафе.";
+
+  }
+
+  if (save.quest === 1) {
+
+    quest.textContent =
+      "Забери 📦 посылку возле почты.";
+
+  }
+
+  if (save.quest === 2) {
+
+    quest.textContent =
+      "Отнеси 📦 посылку на почту.";
+
+  }
+
+  if (save.quest === 3) {
+
+    quest.textContent =
+      "Задание выполнено! Вернись к Алине.";
+
+  }
+
+}
+
+function interact() {
+
+  if (distance(save, Alina) < 90) {
+
+    if (save.quest === 0) {
+
+      save.quest = 1;
+
+      message(
+        "Алина: Привет! Возьми посылку возле почты и принеси её обратно."
+      );
+
+    }
+
+    else if (save.quest === 3) {
+
+      message(
+        "Алина: Отличная работа! Скоро будет новое задание."
+      );
+
+    }
+
+    else {
+
+      message(
+        "Алина: Сначала выполни текущее задание."
+      );
+
+    }
+
+    saveGame();
+    updateInterface();
+
+    return;
+  }
+
+  if (
+    save.quest === 1 &&
+    distance(save, Post) < 90
+  ) {
+
+    save.quest = 2;
+
+    message(
+      "Ты забрала посылку! Теперь отнеси её на почту."
+    );
+
+    saveGame();
+    updateInterface();
+
+    return;
+  }
+
+  if (
+    save.quest === 2 &&
+    distance(save, Post) < 90
+  ) {
+
+    save.quest = 3;
+
+    save.money += 300;
+    save.xp += 150;
+
+    while (
+      save.xp >= save.level * 200
+    ) {
+
+      save.xp -= save.level * 200;
+      save.level++;
+
+    }
+
+    message(
+      "🎉 Задание выполнено! +300 монет и +150 XP"
+    );
+
+    saveGame();
+    updateInterface();
+
+    return;
+  }
+
+  if (distance(save, Shop) < 100) {
+
+    if (save.money >= 100) {
+
+      save.money -= 100;
+
+      save.inventory.push("🍔 Еда");
+
+      message(
+        "Ты купила еду за 100 монет."
+      );
+
+    } else {
+
+      message(
+        "Недостаточно денег."
+      );
+
+    }
+
+    saveGame();
+    updateInterface();
+
+    return;
+  }
+
+  message(
+    "Подойди ближе к персонажу или зданию."
+  );
+
+}
+
+document
+  .getElementById("interact")
+  .addEventListener("click", interact);
+
+document
+  .getElementById("shop")
+  .addEventListener("click", interact);
+
+document
+  .getElementById("reset")
+  .addEventListener("click", () => {
+
+    localStorage.removeItem("novyShag");
+    location.reload();
+
+  });
+
+function building(x,y,w,h,color,name) {
+
+  ctx.fillStyle = color;
+
+  ctx.fillRect(
+    x,
+    y,
+    w,
+    h
+  );
+
+  ctx.fillStyle = "#ffffff";
+
+  ctx.fillRect(
+    x + 15,
+    y + 15,
+    30,
+    25
+  );
+
+  ctx.fillRect(
+    x + w - 45,
+    y + 15,
+    30,
+    25
+  );
+
+  ctx.fillStyle = "#222";
+
+  ctx.font = "bold 14px Arial";
+
+  ctx.fillText(
+    name,
+    x + 10,
+    y + h / 2
+  );
+
+}
+
+function drawNPC(x,y,color,name) {
+
+  ctx.fillStyle = "#f2c7a5";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y - 18,
+    12,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.fillStyle = color;
+
+  ctx.fillRect(
+    x - 12,
+    y - 5,
+    24,
+    30
+  );
+
+  ctx.fillStyle = "#111";
+
+  ctx.font = "bold 13px Arial";
+
+  ctx.fillText(
+    name,
+    x - 30,
+    y + 42
+  );
+
+}
+
+function drawPlayer() {
+
+  ctx.fill
