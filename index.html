@@ -2,17 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1,
-maximum-scale=1,
-user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Новый Шаг</title>
 
 <style>
-
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
@@ -24,364 +18,394 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#20252a;
-    font-family:Arial,sans-serif;
+    background:#111;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
     touch-action:none;
 }
 
-canvas{
-    position:fixed;
+#game{
+    position:absolute;
     left:0;
     top:0;
     width:100%;
     height:100%;
+    display:block;
+    background:#8fb7c8;
 }
 
-/* ================= TOP ================= */
+/* Кинематографический эффект */
 
-#top{
+#cinemaTop,
+#cinemaBottom{
     position:fixed;
+    left:0;
+    width:100%;
+    height:5.5vh;
+    background:#050505;
     z-index:20;
-
-    left:10px;
-    right:10px;
-    top:10px;
-
-    display:flex;
-    gap:8px;
-
     pointer-events:none;
 }
 
-.box{
-    background:rgba(17,22,27,.92);
-    color:white;
-
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:14px;
-
-    box-shadow:0 5px 20px rgba(0,0,0,.35);
+#cinemaTop{
+    top:0;
 }
 
-#profile{
-    width:210px;
-    padding:9px 12px;
+#cinemaBottom{
+    bottom:0;
+}
+
+/* Затемнение по краям */
+
+#vignette{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:10;
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(0,0,0,0) 45%,
+            rgba(0,0,0,.12) 68%,
+            rgba(0,0,0,.48) 100%
+        );
+}
+
+/* Верхняя панель */
+
+#hud{
+    position:fixed;
+    top:calc(5.5vh + 10px);
+    left:12px;
+    right:12px;
+    z-index:30;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    pointer-events:none;
+}
+
+.panel{
+    background:rgba(15,20,24,.78);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:14px;
+    padding:10px 13px;
+    color:white;
+    box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+#playerInfo{
+    min-width:145px;
 }
 
 #playerName{
-    font-size:16px;
-    font-weight:bold;
-}
-
-#levelText{
-    margin-top:4px;
-    font-size:11px;
-    color:#ccc;
-}
-
-#xpBack{
-    height:7px;
-    width:100%;
-    margin-top:6px;
-
-    background:#30363b;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-#xpBar{
-    width:0%;
-    height:100%;
-    background:#58db71;
-}
-
-.stat{
-    min-width:80px;
-    padding:11px 12px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
     font-size:14px;
-    font-weight:bold;
-}
-
-/* ================= QUEST ================= */
-
-#questBox{
-    position:fixed;
-    z-index:20;
-
-    top:88px;
-    left:10px;
-
-    width:min(370px,calc(100% - 20px));
-
-    padding:13px 15px;
-
-    color:white;
-
-    background:rgba(17,22,27,.93);
-
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:15px;
-
-    box-shadow:0 5px 20px rgba(0,0,0,.3);
-}
-
-#questTitle{
-    color:#ffd52e;
-    font-size:12px;
     font-weight:bold;
     margin-bottom:5px;
 }
 
-#questText{
-    font-size:14px;
+#level{
+    font-size:13px;
+    color:#d9e8ed;
 }
 
-/* ================= MESSAGE ================= */
+#xpBar{
+    width:120px;
+    height:6px;
+    margin-top:7px;
+    background:rgba(255,255,255,.18);
+    border-radius:10px;
+    overflow:hidden;
+}
 
-#message{
+#xpFill{
+    width:35%;
+    height:100%;
+    background:linear-gradient(90deg,#72d6a3,#b9f3d1);
+    border-radius:10px;
+}
+
+#moneyInfo{
+    text-align:right;
+}
+
+#money{
+    font-size:17px;
+    font-weight:bold;
+}
+
+#stars{
+    font-size:13px;
+    margin-top:4px;
+    color:#ffd76a;
+}
+
+/* Задание */
+
+#questBox{
     position:fixed;
-    z-index:50;
-
+    top:calc(5.5vh + 92px);
     left:50%;
-    bottom:155px;
-
     transform:translateX(-50%);
+    z-index:30;
 
-    max-width:88%;
+    width:min(420px,calc(100% - 30px));
 
-    padding:12px 18px;
+    background:rgba(12,17,21,.78);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:16px;
+
+    padding:11px 15px;
 
     color:white;
-    background:rgba(15,18,21,.95);
-
-    border-radius:14px;
-
-    font-size:14px;
     text-align:center;
 
-    opacity:0;
-    transition:.2s;
-
-    pointer-events:none;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
 }
 
-#message.show{
-    opacity:1;
+#questTitle{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:#9ed8c0;
+    margin-bottom:4px;
 }
 
-/* ================= MINIMAP ================= */
+#questText{
+    font-size:14px;
+    line-height:1.3;
+}
+
+/* Миникарта */
 
 #miniMap{
     position:fixed;
-    z-index:20;
+    right:14px;
+    bottom:calc(5.5vh + 14px);
 
-    right:12px;
-    top:12px;
+    width:130px;
+    height:95px;
 
-    width:145px;
-    height:145px;
-
-    background:rgba(20,25,30,.9);
-
-    border:3px solid rgba(255,255,255,.4);
-    border-radius:50%;
-
-    box-shadow:0 5px 20px rgba(0,0,0,.4);
-}
-
-/* ================= ACTION ================= */
-
-#action{
-    position:fixed;
     z-index:30;
 
-    right:20px;
-    bottom:24px;
+    border-radius:13px;
+    border:2px solid rgba(255,255,255,.45);
 
-    width:105px;
-    height:105px;
+    background:rgba(10,15,18,.75);
 
+    box-shadow:0 7px 25px rgba(0,0,0,.35);
+}
+
+/* Кнопка действия */
+
+#actionButton{
+    position:fixed;
+    right:18px;
+    bottom:calc(5.5vh + 125px);
+
+    width:72px;
+    height:72px;
+
+    z-index:40;
+
+    border:1px solid rgba(255,255,255,.25);
     border-radius:50%;
 
-    border:2px solid rgba(255,255,255,.3);
-
-    background:rgba(20,25,30,.9);
-
+    background:rgba(25,31,35,.82);
     color:white;
 
-    font-size:13px;
+    font-size:12px;
     font-weight:bold;
 
-    box-shadow:0 6px 22px rgba(0,0,0,.4);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.12);
+
+    display:none;
 }
 
-#action:active{
-    transform:scale(.92);
+#actionButton:active{
+    transform:scale(.94);
+    background:rgba(50,60,65,.95);
 }
 
-/* ================= JOYSTICK ================= */
+/* Джойстик */
 
 #joystick{
     position:fixed;
-    z-index:30;
+    left:22px;
+    bottom:calc(5.5vh + 20px);
 
-    left:18px;
-    bottom:18px;
+    width:125px;
+    height:125px;
 
-    width:155px;
-    height:155px;
+    z-index:40;
 
     border-radius:50%;
 
-    background:rgba(20,25,30,.55);
+    background:rgba(20,27,30,.30);
+    border:2px solid rgba(255,255,255,.20);
 
-    border:2px solid rgba(255,255,255,.16);
+    box-shadow:
+        inset 0 0 25px rgba(0,0,0,.2),
+        0 8px 25px rgba(0,0,0,.2);
 }
 
-#stick{
+#joystickStick{
     position:absolute;
 
     left:50%;
     top:50%;
 
-    width:68px;
-    height:68px;
+    width:55px;
+    height:55px;
 
-    margin-left:-34px;
-    margin-top:-34px;
+    margin-left:-27.5px;
+    margin-top:-27.5px;
 
     border-radius:50%;
 
-    background:rgba(255,255,255,.25);
+    background:rgba(255,255,255,.72);
+    border:2px solid rgba(255,255,255,.8);
 
-    border:2px solid rgba(255,255,255,.35);
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.3);
 }
 
-/* ================= RUN ================= */
+/* Бег */
 
-#run{
+#runButton{
     position:fixed;
-    z-index:30;
+    left:165px;
+    bottom:calc(5.5vh + 27px);
 
-    right:30px;
-    bottom:145px;
+    width:62px;
+    height:62px;
 
-    width:70px;
-    height:45px;
+    z-index:40;
 
-    border:0;
-    border-radius:14px;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:50%;
 
+    background:rgba(20,27,30,.72);
     color:white;
-    background:rgba(20,25,30,.9);
 
+    font-size:11px;
     font-weight:bold;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.3);
 }
 
-#run.active{
-    background:#278a4c;
+#runButton.active{
+    background:rgba(70,105,90,.9);
 }
 
-/* ================= DESKTOP ARROWS ================= */
+/* Подсказка */
 
-#keyboardHelp{
+#hint{
     position:fixed;
-    z-index:10;
-
     left:50%;
-    bottom:5px;
+    bottom:calc(5.5vh + 10px);
 
     transform:translateX(-50%);
 
-    color:rgba(255,255,255,.65);
+    z-index:35;
+
+    color:rgba(255,255,255,.75);
 
     font-size:11px;
-}
 
-/* ================= MOBILE ================= */
+    background:rgba(0,0,0,.35);
+    padding:6px 10px;
+    border-radius:10px;
+
+    pointer-events:none;
+}
 
 @media(max-width:600px){
 
-    #top{
-        top:6px;
-        left:6px;
-        right:6px;
-        gap:4px;
+    #hud{
+        top:calc(5.5vh + 7px);
+        left:8px;
+        right:8px;
     }
 
-    #profile{
-        width:145px;
-        padding:7px 8px;
+    .panel{
+        padding:8px 10px;
+        border-radius:12px;
+    }
+
+    #playerInfo{
+        min-width:125px;
     }
 
     #playerName{
-        font-size:13px;
+        font-size:12px;
     }
 
-    #levelText{
-        font-size:9px;
-    }
-
-    .stat{
-        min-width:57px;
-        padding:8px 4px;
+    #level{
         font-size:11px;
     }
 
+    #money{
+        font-size:14px;
+    }
+
     #questBox{
-        top:70px;
-        left:7px;
-        width:calc(100% - 14px);
-        padding:9px 11px;
+        top:calc(5.5vh + 72px);
+        width:calc(100% - 24px);
     }
 
     #questText{
         font-size:12px;
     }
 
-    #questTitle{
-        font-size:10px;
-    }
-
     #miniMap{
         width:105px;
-        height:105px;
-        right:8px;
-        top:65px;
+        height:78px;
+        right:10px;
+        bottom:calc(5.5vh + 10px);
+    }
+
+    #actionButton{
+        width:64px;
+        height:64px;
+        right:10px;
+        bottom:calc(5.5vh + 100px);
     }
 
     #joystick{
-        width:145px;
-        height:145px;
-        left:10px;
-        bottom:10px;
+        left:14px;
+        bottom:calc(5.5vh + 12px);
+        width:110px;
+        height:110px;
     }
 
-    #action{
-        width:82px;
-        height:82px;
-        right:12px;
-        bottom:18px;
-        font-size:11px;
+    #joystickStick{
+        width:50px;
+        height:50px;
+        margin-left:-25px;
+        margin-top:-25px;
     }
 
-    #run{
-        right:20px;
-        bottom:115px;
-        width:65px;
-        height:40px;
+    #runButton{
+        left:132px;
+        bottom:calc(5.5vh + 20px);
+        width:55px;
+        height:55px;
     }
 
-    #keyboardHelp{
+    #hint{
         display:none;
     }
 }
-
 </style>
 </head>
 
@@ -389,30 +413,34 @@ canvas{
 
 <canvas id="game"></canvas>
 
-<div id="top">
+<div id="cinemaTop"></div>
+<div id="cinemaBottom"></div>
+<div id="vignette"></div>
 
-    <div id="profile" class="box">
+<div id="hud">
 
-        <div id="playerName">
-            Игрок
+    <div id="playerInfo" class="panel">
+        <div id="playerName">НАСТЯ</div>
+
+        <div id="level">
+            Уровень <span id="levelNumber">1</span>
         </div>
 
-        <div id="levelText">
-            Уровень 1 · 0 / 100 XP
+        <div id="xpBar">
+            <div id="xpFill"></div>
         </div>
-
-        <div id="xpBack">
-            <div id="xpBar"></div>
-        </div>
-
     </div>
 
-    <div class="stat box">
-        💰 <span id="money">500</span>
-    </div>
+    <div id="moneyInfo" class="panel">
 
-    <div class="stat box">
-        ⭐ <span id="stars">0</span>
+        <div id="money">
+            💰 <span id="moneyNumber">100</span>
+        </div>
+
+        <div id="stars">
+            ⭐ <span id="starNumber">0</span>
+        </div>
+
     </div>
 
 </div>
@@ -420,1817 +448,267 @@ canvas{
 <div id="questBox">
 
     <div id="questTitle">
-        ⚠️ ТЕКУЩАЯ ЗАДАЧА
+        НОВОЕ ЗАДАНИЕ
     </div>
 
     <div id="questText">
-        Найди Алину возле кафе
+        Найди Алину
     </div>
 
 </div>
 
 <canvas id="miniMap"></canvas>
 
-<div id="message"></div>
+<button id="actionButton">
+    ВЗАИМОДЕЙСТВИЕ
+</button>
 
 <div id="joystick">
-    <div id="stick"></div>
+    <div id="joystickStick"></div>
 </div>
 
-<button id="run">
-    🏃 БЕГ
+<button id="runButton">
+    БЕГ
 </button>
 
-<button id="action">
-    ВЗАИМОДЕЙСТВОВАТЬ
-</button>
-
-<div id="keyboardHelp">
-    WASD / стрелки — движение
+<div id="hint">
+    Используй джойстик для движения
 </div>
-
 
 <script>
 
-/* =========================================================
-   ОСНОВНЫЕ НАСТРОЙКИ
-   ========================================================= */
+/* =========================================
+   НОВЫЙ ШАГ — КИНЕМАТОГРАФИЧЕСКАЯ ВЕРСИЯ
+   ЧАСТЬ 1
+========================================= */
 
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-const mini=document.getElementById("miniMap");
-const mctx=mini.getContext("2d");
+const miniMap = document.getElementById("miniMap");
+const miniCtx = miniMap.getContext("2d");
 
-let screenW=innerWidth;
-let screenH=innerHeight;
+let W = window.innerWidth;
+let H = window.innerHeight;
 
 function resize(){
 
-    screenW=innerWidth;
-    screenH=innerHeight;
+    W = window.innerWidth;
+    H = window.innerHeight;
 
-    const dpr=devicePixelRatio||1;
+    canvas.width = W;
+    canvas.height = H;
 
-    canvas.width=screenW*dpr;
-    canvas.height=screenH*dpr;
-
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-
-    mini.width=145;
-    mini.height=145;
+    miniMap.width = 260;
+    miniMap.height = 190;
 }
+
+window.addEventListener("resize", resize);
 
 resize();
 
-addEventListener("resize",resize);
 
-
-/* =========================================================
+/* =========================================
    МИР
-   ========================================================= */
+========================================= */
 
-const WORLD_W=3200;
-const WORLD_H=2400;
-
-
-/* =========================================================
-   КАМЕРА
-   ========================================================= */
-
-const camera={
-    x:0,
-    y:0
-};
+const WORLD_W = 3200;
+const WORLD_H = 2400;
 
 
-/* =========================================================
+/* =========================================
    ИГРОК
-   ========================================================= */
+========================================= */
 
-const player={
+const player = {
 
     x:1600,
-    y:1180,
+    y:1210,
 
-    radius:15,
+    width:32,
+    height:42,
 
-    /* ОЧЕНЬ БЫСТРАЯ ХОДЬБА */
+    /* Обычная скорость теперь спокойная */
 
-    walkSpeed:11,
-    runSpeed:22,
+    walkSpeed:5.2,
 
-    money:500,
+    /* Бег тоже умеренный */
 
-    xp:0,
+    runSpeed:8.5,
 
-    level:1,
+    direction:"down",
 
-    stars:0
-
+    moving:false
 };
 
 
-/* =========================================================
+/* =========================================
+   КАМЕРА
+========================================= */
+
+const camera = {
+
+    x:0,
+    y:0,
+
+    smooth:0.09
+};
+
+
+/* =========================================
+   СОСТОЯНИЕ ИГРЫ
+========================================= */
+
+let money = 100;
+
+let xp = 0;
+
+let level = 1;
+
+let stars = 0;
+
+let quest = 0;
+
+
+/* =========================================
    УПРАВЛЕНИЕ
-   ========================================================= */
+========================================= */
 
-const input={
+const keys = {};
 
-    up:false,
-    down:false,
-    left:false,
-    right:false,
+window.addEventListener("keydown",function(e){
 
-    run:false
+    keys[e.key.toLowerCase()] = true;
 
-};
+});
+
+window.addEventListener("keyup",function(e){
+
+    keys[e.key.toLowerCase()] = false;
+
+});
 
 
-/* =========================================================
-   КЛАВИАТУРА
-   ========================================================= */
+/* =========================================
+   ДЖОЙСТИК
+========================================= */
 
-addEventListener("keydown",e=>{
+const joystick =
+    document.getElementById("joystick");
 
-    const k=e.key.toLowerCase();
+const joystickStick =
+    document.getElementById("joystickStick");
 
-    if(k==="w" || e.key==="ArrowUp")
-        input.up=true;
+let joystickActive = false;
 
-    if(k==="s" || e.key==="ArrowDown")
-        input.down=true;
+let joystickX = 0;
+let joystickY = 0;
 
-    if(k==="a" || e.key==="ArrowLeft")
-        input.left=true;
+function joystickMove(clientX,clientY){
 
-    if(k==="d" || e.key==="ArrowRight")
-        input.right=true;
+    const rect = joystick.getBoundingClientRect();
 
-    if(k==="shift")
-        input.run=true;
+    const centerX =
+        rect.left + rect.width / 2;
 
-    if(k===" "){
-        e.preventDefault();
-        interact();
+    const centerY =
+        rect.top + rect.height / 2;
+
+    let dx = clientX - centerX;
+    let dy = clientY - centerY;
+
+    const maxDistance =
+        rect.width * 0.32;
+
+    const distance =
+        Math.sqrt(dx*dx + dy*dy);
+
+    if(distance > maxDistance){
+
+        dx =
+            dx / distance * maxDistance;
+
+        dy =
+            dy / distance * maxDistance;
     }
 
-});
+    joystickX = dx / maxDistance;
+    joystickY = dy / maxDistance;
 
-addEventListener("keyup",e=>{
+    joystickStick.style.transform =
+        `translate(${dx}px,${dy}px)`;
+}
 
-    const k=e.key.toLowerCase();
 
-    if(k==="w" || e.key==="ArrowUp")
-        input.up=false;
+joystick.addEventListener("pointerdown",function(e){
 
-    if(k==="s" || e.key==="ArrowDown")
-        input.down=false;
+    joystickActive = true;
 
-    if(k==="a" || e.key==="ArrowLeft")
-        input.left=false;
+    joystick.setPointerCapture(e.pointerId);
 
-    if(k==="d" || e.key==="ArrowRight")
-        input.right=false;
-
-    if(k==="shift")
-        input.run=false;
+    joystickMove(e.clientX,e.clientY);
 
 });
 
 
-/* =========================================================
+joystick.addEventListener("pointermove",function(e){
+
+    if(!joystickActive) return;
+
+    joystickMove(e.clientX,e.clientY);
+
+});
+
+
+joystick.addEventListener("pointerup",function(){
+
+    joystickActive = false;
+
+    joystickX = 0;
+    joystickY = 0;
+
+    joystickStick.style.transform =
+        "translate(0,0)";
+});
+
+
+/* =========================================
    КНОПКА БЕГА
-   ========================================================= */
+========================================= */
 
-const runButton=document.getElementById("run");
+const runButton =
+    document.getElementById("runButton");
 
-runButton.addEventListener("pointerdown",e=>{
+let running = false;
 
-    e.preventDefault();
+runButton.addEventListener("pointerdown",function(){
 
-    input.run=true;
+    running = true;
 
     runButton.classList.add("active");
 
 });
 
-function stopRun(){
+runButton.addEventListener("pointerup",function(){
 
-    input.run=false;
+    running = false;
 
     runButton.classList.remove("active");
-}
-
-runButton.addEventListener("pointerup",stopRun);
-runButton.addEventListener("pointercancel",stopRun);
-runButton.addEventListener("pointerleave",stopRun);
-
-
-/* =========================================================
-   ДЖОЙСТИК
-   ========================================================= */
-
-const joystick=document.getElementById("joystick");
-const stick=document.getElementById("stick");
-
-let joystickActive=false;
-
-function joystickMove(e){
-
-    const rect=joystick.getBoundingClientRect();
-
-    const cx=rect.left+rect.width/2;
-    const cy=rect.top+rect.height/2;
-
-    let dx=e.clientX-cx;
-    let dy=e.clientY-cy;
-
-    const max=45;
-
-    const dist=Math.sqrt(dx*dx+dy*dy);
-
-    if(dist>max){
-
-        dx=dx/dist*max;
-        dy=dy/dist*max;
-    }
-
-    stick.style.transform=
-        `translate(${dx}px,${dy}px)`;
-
-    input.left=dx<-10;
-    input.right=dx>10;
-    input.up=dy<-10;
-    input.down=dy>10;
-}
-
-joystick.addEventListener("pointerdown",e=>{
-
-    joystickActive=true;
-
-    joystick.setPointerCapture(e.pointerId);
-
-    joystickMove(e);
 
 });
 
-joystick.addEventListener("pointermove",e=>{
+runButton.addEventListener("pointercancel",function(){
 
-    if(joystickActive)
-        joystickMove(e);
+    running = false;
+
+    runButton.classList.remove("active");
 
 });
 
-function resetJoystick(){
 
-    joystickActive=false;
-
-    stick.style.transform="translate(0,0)";
-
-    input.left=false;
-    input.right=false;
-    input.up=false;
-    input.down=false;
-}
-
-joystick.addEventListener("pointerup",resetJoystick);
-joystick.addEventListener("pointercancel",resetJoystick);
-
-
-/* =========================================================
-   ДОРОГИ
-   ========================================================= */
-
-const roads=[
-
-    {x:0,y:450,w:WORLD_W,h:180},
-
-    {x:0,y:1120,w:WORLD_W,h:180},
-
-    {x:550,y:0,w:180,h:WORLD_H},
-
-    {x:1500,y:0,w:180,h:WORLD_H},
-
-    {x:2550,y:0,w:180,h:WORLD_H}
-
-];
-
-
-/* =========================================================
-   ЗДАНИЯ
-   ========================================================= */
-
-const buildings=[
-
-    {x:70,y:70,w:400,h:300,color:"#cbd1d5",roof:"#6c7379",name:"Жилой дом"},
-
-    {x:820,y:80,w:510,h:300,color:"#dfd3c2",roof:"#805b45",name:"Кафе"},
-
-    {x:1810,y:80,w:560,h:300,color:"#c9d0d5",roof:"#70777c",name:"Жилой дом"},
-
-    {x:2820,y:80,w:300,h:300,color:"#d5d8db",roof:"#777",name:"Дом"},
-
-    {x:60,y:730,w:400,h:300,color:"#d5d0c5",roof:"#756052",name:"Почта"},
-
-    {x:820,y:730,w:500,h:300,color:"#d1d4d7",roof:"#696f74",name:"Магазин"},
-
-    {x:1810,y:730,w:560,h:300,color:"#d5d7da",roof:"#777",name:"Торговый центр"},
-
-    {x:2820,y:730,w:300,h:300,color:"#d6d8da",roof:"#777",name:"Дом"},
-
-    {x:60,y:1420,w:400,h:300,color:"#d4d7da",roof:"#70767b",name:"Дом"},
-
-    {x:820,y:1420,w:500,h:300,color:"#dfd0bd",roof:"#805a45",name:"Дом"},
-
-    {x:1810,y:1420,w:560,h:300,color:"#d0d4d8",roof:"#6e7479",name:"Дом"},
-
-    {x:2820,y:1420,w:300,h:300,color:"#d8dade",roof:"#747",name:"Дом"},
-
-    {x:60,y:2050,w:400,h:280,color:"#d5d7d9",roof:"#707",name:"Дом"},
-
-    {x:820,y:2050,w:500,h:280,color:"#ded0bd",roof:"#805b47",name:"Дом"},
-
-    {x:1810,y:2050,w:560,h:280,color:"#d2d5d8",roof:"#707",name:"Дом"}
-
-];
-
-
-/* =========================================================
-   ПАРКИ
-   ========================================================= */
-
-const parks=[
-
-    {
-        x:820,
-        y:1330,
-        w:500,
-        h:350
-    },
-
-    {
-        x:1810,
-        y:500,
-        w:560,
-        h:180
-    },
-
-    {
-        x:2770,
-        y:1120,
-        w:400,
-        h:260
-    }
-
-];
-
-
-/* =========================================================
-   ДЕРЕВЬЯ
-   ========================================================= */
-
-const trees=[];
-
-function generateTrees(){
-
-    for(let i=0;i<230;i++){
-
-        const x=30+Math.random()*(WORLD_W-60);
-        const y=30+Math.random()*(WORLD_H-60);
-
-        let ok=true;
-
-        for(const b of buildings){
-
-            if(
-                x>b.x-35 &&
-                x<b.x+b.w+35 &&
-                y>b.y-35 &&
-                y<b.y+b.h+35
-            ){
-                ok=false;
-                break;
-            }
-        }
-
-        for(const r of roads){
-
-            if(
-                x>r.x-25 &&
-                x<r.x+r.w+25 &&
-                y>r.y-25 &&
-                y<r.y+r.h+25
-            ){
-                ok=false;
-                break;
-            }
-        }
-
-        if(ok){
-
-            trees.push({
-                x,
-                y,
-                size:12+Math.random()*12
-            });
-        }
-    }
-}
-
-generateTrees();
-
-
-/* =========================================================
-   NPC
-   ========================================================= */
-
-const alina={
-
-    x:1060,
-    y:415,
-
-    radius:18
-};
-
-
-/* =========================================================
-   ПОСЫЛКА
-   ========================================================= */
-
-const packageItem={
-
-    x:260,
-    y:1060,
-
-    visible:false,
-    taken:false
-
-};
-
-
-/* =========================================================
-   МАШИНЫ
-   ========================================================= */
-
-const cars=[];
-
-const carColors=[
-    "#e63946",
-    "#2878c8",
-    "#f2b134",
-    "#343a40",
-    "#eeeeee",
-    "#4caf50",
-    "#9b59b6"
-];
-
-for(let i=0;i<18;i++){
-
-    cars.push({
-
-        x:Math.random()*WORLD_W,
-
-        y:
-            i%2===0
-            ?450+Math.random()*180
-            :1120+Math.random()*180,
-
-        speed:
-            1.5+Math.random()*2.5,
-
-        direction:
-            Math.random()>.5?1:-1,
-
-        color:
-            carColors[
-                Math.floor(
-                    Math.random()*carColors.length
-                )
-            ]
-
-    });
-}
-
-
-/* =========================================================
-   КВЕСТ
-   ========================================================= */
-
-let quest=0;
-
-const questText=
-document.getElementById("questText");
-
-function updateQuest(){
-
-    if(quest===0)
-        questText.textContent=
-        "Найди Алину возле кафе";
-
-    if(quest===1)
-        questText.textContent=
-        "Иди на почту и забери посылку";
-
-    if(quest===2)
-        questText.textContent=
-        "Забери посылку возле почты";
-
-    if(quest===3)
-        questText.textContent=
-        "Отнеси посылку Алине";
-
-    if(quest===4)
-        questText.textContent=
-        "Вернись к Алине";
-
-    if(quest===5)
-        questText.textContent=
-        "🎉 Задание выполнено!";
-}
-
-
-/* =========================================================
-   UI
-   ========================================================= */
-
-function updateUI(){
-
-    document.getElementById("money")
-    .textContent=player.money;
-
-    document.getElementById("stars")
-    .textContent=player.stars;
-
-    document.getElementById("levelText")
-    .textContent=
-        "Уровень "+
-        player.level+
-        " · "+
-        player.xp+
-        " / 100 XP";
-
-    document.getElementById("xpBar")
-    .style.width=
-        Math.min(player.xp,100)+"%";
-}
-
-
-/* =========================================================
-   СООБЩЕНИЕ
-   ========================================================= */
-
-let messageTimer;
-
-function showMessage(text){
-
-    const el=
-        document.getElementById("message");
-
-    el.textContent=text;
-
-    el.classList.add("show");
-
-    clearTimeout(messageTimer);
-
-    messageTimer=setTimeout(()=>{
-
-        el.classList.remove("show");
-
-    },3000);
-}
-
-
-/* =========================================================
-   СТОЛКНОВЕНИЕ
-   ========================================================= */
-
-function collisionCircleRect(x,y,r,b){
-
-    const nx=Math.max(
-        b.x,
-        Math.min(x,b.x+b.w)
-    );
-
-    const ny=Math.max(
-        b.y,
-        Math.min(y,b.y+b.h)
-    );
-
-    const dx=x-nx;
-    const dy=y-ny;
-
-    return dx*dx+dy*dy<r*r;
-}
-
-
-function canMove(x,y){
-
-    if(
-        x<15 ||
-        y<15 ||
-        x>WORLD_W-15 ||
-        y>WORLD_H-15
-    ){
-        return false;
-    }
-
-    for(const b of buildings){
-
-        if(
-            collisionCircleRect(
-                x,
-                y,
-                player.radius,
-                {
-                    x:b.x-5,
-                    y:b.y-5,
-                    w:b.w+10,
-                    h:b.h+10
-                }
-            )
-        ){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-/* =========================================================
-   ДВИЖЕНИЕ
-   ========================================================= */
-
-function movePlayer(){
-
-    let dx=0;
-    let dy=0;
-
-    if(input.up)dy--;
-    if(input.down)dy++;
-    if(input.left)dx--;
-    if(input.right)dx++;
-
-    if(dx===0 && dy===0)
-        return;
-
-    const len=
-        Math.sqrt(dx*dx+dy*dy);
-
-    dx/=len;
-    dy/=len;
-
-    const speed=
-        input.run
-        ?player.runSpeed
-        :player.walkSpeed;
-
-    const nx=
-        player.x+
-        dx*speed;
-
-    const ny=
-        player.y+
-        dy*speed;
-
-    if(canMove(nx,player.y))
-        player.x=nx;
-
-    if(canMove(player.x,ny))
-        player.y=ny;
-}
-
-
-/* =========================================================
-   КАМЕРА
-   ========================================================= */
-
-function updateCamera(){
-
-    const targetX=
-        player.x-screenW/2;
-
-    const targetY=
-        player.y-screenH/2;
-
-    camera.x+=
-        (targetX-camera.x)*.12;
-
-    camera.y+=
-        (targetY-camera.y)*.12;
-
-    camera.x=Math.max(
-        0,
-        Math.min(
-            WORLD_W-screenW,
-            camera.x
-        )
-    );
-
-    camera.y=Math.max(
-        0,
-        Math.min(
-            WORLD_H-screenH,
-            camera.y
-        )
-    );
-}
-
-
-/* =========================================================
-   РИСОВАНИЕ МИРА
-   ========================================================= */
-
-function drawWorld(){
-
-    ctx.fillStyle="#67a453";
-
-    ctx.fillRect(
-        0,
-        0,
-        screenW,
-        screenH
-    );
-
-    ctx.save();
-
-    ctx.translate(
-        -camera.x,
-        -camera.y
-    );
-
-
-    /* земля */
-
-    ctx.fillStyle="#6fa85a";
-
-    ctx.fillRect(
-        0,
-        0,
-        WORLD_W,
-        WORLD_H
-    );
-
-
-    /* кварталы */
-
-    ctx.fillStyle="#79ad61";
-
-    for(let x=0;x<WORLD_W;x+=220){
-
-        for(let y=0;y<WORLD_H;y+=220){
-
-            ctx.fillRect(
-                x,
-                y,
-                200,
-                200
-            );
-        }
-    }
-
-
-    /* парки */
-
-    for(const p of parks){
-
-        ctx.fillStyle="#4e9648";
-
-        ctx.fillRect(
-            p.x,
-            p.y,
-            p.w,
-            p.h
-        );
-
-        ctx.strokeStyle="#d9c99d";
-        ctx.lineWidth=12;
-
-        ctx.strokeRect(
-            p.x+8,
-            p.y+8,
-            p.w-16,
-            p.h-16
-        );
-
-
-        ctx.strokeStyle="#d8c69a";
-        ctx.lineWidth=10;
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            p.x+20,
-            p.y+p.h/2
-        );
-
-        ctx.lineTo(
-            p.x+p.w-20,
-            p.y+p.h/2
-        );
-
-        ctx.stroke();
-    }
-
-
-    /* тротуары */
-
-    for(const r of roads){
-
-        ctx.fillStyle="#c7c6c1";
-
-        ctx.fillRect(
-            r.x-17,
-            r.y-17,
-            r.w+34,
-            r.h+34
-        );
-    }
-
-
-    /* дороги */
-
-    for(const r of roads){
-
-        ctx.fillStyle="#373c41";
-
-        ctx.fillRect(
-            r.x,
-            r.y,
-            r.w,
-            r.h
-        );
-
-
-        /* края */
-
-        ctx.strokeStyle="#5a6065";
-        ctx.lineWidth=3;
-
-        ctx.strokeRect(
-            r.x,
-            r.y,
-            r.w,
-            r.h
-        );
-
-
-        /* разметка */
-
-        ctx.strokeStyle="#eeeeea";
-        ctx.lineWidth=3;
-        ctx.setLineDash([32,28]);
-
-        ctx.beginPath();
-
-        if(r.w>r.h){
-
-            ctx.moveTo(
-                r.x,
-                r.y+r.h/2
-            );
-
-            ctx.lineTo(
-                r.x+r.w,
-                r.y+r.h/2
-            );
-
-        }else{
-
-            ctx.moveTo(
-                r.x+r.w/2,
-                r.y
-            );
-
-            ctx.lineTo(
-                r.x+r.w/2,
-                r.y+r.h
-            );
-        }
-
-        ctx.stroke();
-
-        ctx.setLineDash([]);
-    }
-
-
-    /* пешеходные переходы */
-
-    drawCrosswalk(550,450);
-    drawCrosswalk(1500,450);
-    drawCrosswalk(2550,450);
-
-    drawCrosswalk(550,1120);
-    drawCrosswalk(1500,1120);
-    drawCrosswalk(2550,1120);
-
-
-    /* здания */
-
-    for(const b of buildings){
-
-        /* тень */
-
-        ctx.fillStyle="rgba(0,0,0,.2)";
-
-        ctx.fillRect(
-            b.x+12,
-            b.y+12,
-            b.w,
-            b.h
-        );
-
-
-        /* стены */
-
-        ctx.fillStyle=b.color;
-
-        ctx.fillRect(
-            b.x,
-            b.y,
-            b.w,
-            b.h
-        );
-
-
-        /* крыша */
-
-        ctx.fillStyle=b.roof;
-
-        ctx.fillRect(
-            b.x,
-            b.y,
-            b.w,
-            38
-        );
-
-
-        /* окна */
-
-        const columns=
-            Math.floor(b.w/65);
-
-        for(let row=0;row<4;row++){
-
-            for(let col=0;col<columns;col++){
-
-                const wx=
-                    b.x+
-                    25+
-                    col*62;
-
-                const wy=
-                    b.y+
-                    58+
-                    row*48;
-
-                if(
-                    wx+27<
-                    b.x+b.w-15
-                ){
-
-                    ctx.fillStyle=
-                        row%2===0
-                        ?" #8fc8dc".trim()
-                        :"#7bb7ca";
-
-                    ctx.fillRect(
-                        wx,
-                        wy,
-                        27,
-                        23
-                    );
-
-                    ctx.strokeStyle=
-                        "rgba(0,0,0,.2)";
-
-                    ctx.strokeRect(
-                        wx,
-                        wy,
-                        27,
-                        23
-                    );
-                }
-            }
-        }
-
-
-        /* вход */
-
-        ctx.fillStyle="#49372e";
-
-        ctx.fillRect(
-            b.x+b.w/2-18,
-            b.y+b.h-58,
-            36,
-            58
-        );
-    }
-
-
-    /* вывески */
-
-    sign(
-        900,
-        120,
-        250,
-        "☕  КАФЕ"
-    );
-
-    sign(
-        125,
-        770,
-        230,
-        "✉  ПОЧТА"
-    );
-
-    sign(
-        900,
-        770,
-        230,
-        "🛒  МАГАЗИН"
-    );
-
-
-    /* деревья */
-
-    for(const t of trees)
-        drawTree(t);
-
-
-    /* машины */
-
-    for(const car of cars)
-        drawCar(car);
-
-
-    /* посылка */
-
-    if(
-        packageItem.visible &&
-        !packageItem.taken
-    ){
-        drawPackage(
-            packageItem.x,
-            packageItem.y
-        );
-    }
-
-
-    /* Алина */
-
-    drawAlina();
-
-
-    /* игрок */
-
-    drawPlayer();
-
-
-    ctx.restore();
-}
-
-
-/* =========================================================
-   ПЕРЕХОД
-   ========================================================= */
-
-function drawCrosswalk(x,y){
-
-    ctx.fillStyle="#f3f3ef";
-
-    for(let i=0;i<7;i++){
-
-        ctx.fillRect(
-            x-35+i*11,
-            y-25,
-            6,
-            50
-        );
-    }
-}
-
-
-/* =========================================================
-   ДЕРЕВО
-   ========================================================= */
-
-function drawTree(t){
-
-    ctx.fillStyle="rgba(0,0,0,.2)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        t.x,
-        t.y+14,
-        t.size,
-        t.size*.45,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    ctx.fillStyle="#67472f";
-
-    ctx.fillRect(
-        t.x-4,
-        t.y,
-        8,
-        t.size+13
-    );
-
-
-    ctx.fillStyle="#2f7135";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        t.x,
-        t.y,
-        t.size,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    ctx.fillStyle="#438d43";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        t.x-6,
-        t.y-7,
-        t.size*.65,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-}
-
-
-/* =========================================================
-   МАШИНА
-   ========================================================= */
-
-function drawCar(c){
-
-    ctx.fillStyle="rgba(0,0,0,.3)";
-
-    ctx.fillRect(
-        c.x+4,
-        c.y+5,
-        48,
-        25
-    );
-
-
-    ctx.fillStyle=c.color;
-
-    ctx.fillRect(
-        c.x,
-        c.y,
-        48,
-        25
-    );
-
-
-    ctx.fillStyle="#a8d4e1";
-
-    ctx.fillRect(
-        c.x+9,
-        c.y+4,
-        12,
-        10
-    );
-
-    ctx.fillRect(
-        c.x+27,
-        c.y+4,
-        12,
-        10
-    );
-
-
-    ctx.fillStyle="#222";
-
-    ctx.fillRect(
-        c.x+7,
-        c.y+21,
-        8,
-        5
-    );
-
-    ctx.fillRect(
-        c.x+33,
-        c.y+21,
-        8,
-        5
-    );
-}
-
-
-/* =========================================================
-   ВЫВЕСКА
-   ========================================================= */
-
-function sign(x,y,w,text){
-
-    ctx.fillStyle="rgba(0,0,0,.3)";
-
-    ctx.fillRect(
-        x+5,
-        y+5,
-        w,
-        48
-    );
-
-
-    ctx.fillStyle="#8d4c2e";
-
-    ctx.fillRect(
-        x,
-        y,
-        w,
-        48
-    );
-
-
-    ctx.fillStyle="#fff";
-
-    ctx.font="bold 18px Arial";
-
-    ctx.textAlign="center";
-
-    ctx.fillText(
-        text,
-        x+w/2,
-        y+31
-    );
-}
-
-
-/* =========================================================
-   АЛИНА
-   ========================================================= */
-
-function drawAlina(){
-
-    ctx.fillStyle="rgba(0,0,0,.25)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        alina.x,
-        alina.y+19,
-        14,
-        6,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* тело */
-
-    ctx.fillStyle="#e86d8b";
-
-    ctx.fillRect(
-        alina.x-10,
-        alina.y-1,
-        20,
-        23
-    );
-
-
-    /* голова */
-
-    ctx.fillStyle="#f2c3a2";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        alina.x,
-        alina.y-14,
-        11,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* волосы */
-
-    ctx.fillStyle="#5a3828";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        alina.x,
-        alina.y-18,
-        12,
-        Math.PI,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* знак */
-
-    ctx.fillStyle="#ffd52c";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        alina.x,
-        alina.y-48,
-        15,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    ctx.fillStyle="#222";
-
-    ctx.font="bold 18px Arial";
-
-    ctx.textAlign="center";
-
-    ctx.fillText(
-        "!",
-        alina.x,
-        alina.y-42
-    );
-
-
-    ctx.fillStyle="#fff";
-
-    ctx.font="bold 14px Arial";
-
-    ctx.fillText(
-        "Алина",
-        alina.x,
-        alina.y+43
-    );
-}
-
-
-/* =========================================================
-   ИГРОК
-   ========================================================= */
-
-function drawPlayer(){
-
-    ctx.fillStyle="rgba(0,0,0,.3)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        player.x,
-        player.y+17,
-        14,
-        6,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* тело */
-
-    ctx.fillStyle="#2778dc";
-
-    ctx.fillRect(
-        player.x-10,
-        player.y-2,
-        20,
-        24
-    );
-
-
-    /* голова */
-
-    ctx.fillStyle="#f1c19e";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        player.x,
-        player.y-15,
-        11,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* волосы */
-
-    ctx.fillStyle="#4b3428";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        player.x,
-        player.y-19,
-        12,
-        Math.PI,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    /* указатель */
-
-    ctx.fillStyle="#58d5ff";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        player.x,
-        player.y-51
-    );
-
-    ctx.lineTo(
-        player.x-9,
-        player.y-36
-    );
-
-    ctx.lineTo(
-        player.x+9,
-        player.y-36
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-}
-
-
-/* =========================================================
-   ПОСЫЛКА
-   ========================================================= */
-
-function drawPackage(x,y){
-
-    ctx.fillStyle="#b87c38";
-
-    ctx.fillRect(
-        x-14,
-        y-14,
-        28,
-        28
-    );
-
-
-    ctx.strokeStyle="#6c431d";
-    ctx.lineWidth=3;
-
-    ctx.beginPath();
-
-    ctx.moveTo(x,y-14);
-    ctx.lineTo(x,y+14);
-
-    ctx.stroke();
-
-
-    ctx.fillStyle="#fff";
-
-    ctx.font="18px Arial";
-
-    ctx.textAlign="center";
-
-    ctx.fillText(
-        "📦",
-        x,
-        y+6
-    );
-}
-
-
-/* =========================================================
-   МАШИНЫ ДВИЖЕНИЕ
-   ========================================================= */
-
-function updateCars(){
-
-    for(const car of cars){
-
-        car.x+=
-            car.speed*
-            car.direction;
-
-        if(car.direction>0 &&
-           car.x>WORLD_W+100){
-
-            car.x=-100;
-        }
-
-        if(car.direction<0 &&
-           car.x<-100){
-
-            car.x=WORLD_W+100;
-        }
-    }
-}
-
-
-/* =========================================================
-   РАССТОЯНИЕ
-   ========================================================= */
-
-function distance(a,b){
-
-    const dx=a.x-b.x;
-    const dy=a.y-b.y;
-
-    return Math.sqrt(
-        dx*dx+dy*dy
-    );
-}
-
-
-/* =========================================================
-   ВЗАИМОДЕЙСТВИЕ
-   ========================================================= */
-
-function interact(){
-
-    /* Алина */
-
-    if(
-        distance(player,alina)<95
-    ){
-
-        if(quest===0){
-
-            quest=1;
-
-            updateQuest();
-
-            showMessage(
-                "Алина: Привет! Забери для меня посылку на почте 📦"
-            );
-
-            return;
-        }
-
-
-        if(quest===3){
-
-            quest=4;
-
-            updateQuest();
-
-            showMessage(
-                "Алина: Спасибо! Теперь возвращайся ко мне."
-            );
-
-            return;
-        }
-
-
-        if(quest===4){
-
-            quest=5;
-
-            player.money+=150;
-            player.xp+=100;
-            player.stars+=1;
-
-            if(player.xp>=100){
-
-                player.xp-=100;
-                player.level++;
-            }
-
-            updateQuest();
-            updateUI();
-
-            showMessage(
-                "🎉 Задание выполнено! +150 💰 +100 XP"
-            );
-
-            return;
-        }
-
-
-        showMessage(
-            "Алина: Пока новых заданий нет."
-        );
-
-        return;
-    }
-
-
-    /* почта */
-
-    const post={
-        x:260,
-        y:1060
-    };
-
-
-    if(
-        quest===1 &&
-        distance(player,post)<120
-    ){
-
-        quest=2;
-
-        packageItem.visible=true;
-
-        updateQuest();
-
-        showMessage(
-            "📦 Посылка готова. Подойди к ней."
-        );
-
-        return;
-    }
-
-
-    /* посылка */
-
-    if(
-        quest===2 &&
-        packageItem.visible &&
-        distance(player,packageItem)<80
-    ){
-
-        packageItem.visible=false;
-        packageItem.taken=true;
-
-        quest=3;
-
-        updateQuest();
-
-        showMessage(
-            "📦 Посылка получена! Отнеси её Алине."
-        );
-
-        return;
-    }
-
-
-    showMessage(
-        "Здесь пока нечего делать."
-    );
-}
-
-
-document
-.getElementById("action")
-.addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        interact();
-    }
-);
-
-
-/* =========================================================
-   МИНИ-КАРТА
-   ========================================================= */
-
-function drawMiniMap(){
-
-    const w=145;
-    const h=145;
-
-    mctx.clearRect(
-        0,
-        0,
-        w,
-        h
-    );
-
-    mctx.fillStyle="#6da65a";
-
-    mctx.fillRect(
-        0,
-        0,
-        w,
-        h
-    );
-
-
-    /* дороги */
-
-    for(const r of roads){
-
-        mctx.fillStyle="#42474b";
-
-        mctx.fillRect(
-            r.x/WORLD_W*w,
-            r.y/WORLD_H*h,
-            r.w/WORLD_W*w,
-            r.h/WORLD_H*h
-        );
-    }
-
-
-    /* здания */
-
-    for(const b of buildings){
-
-        mctx.fillStyle="#8b8f91";
-
-        mctx.fillRect(
-            b.x/WORLD_W*w,
-            b.y/WORLD_H*h,
-            b.w/WORLD_W*w,
-            b.h/WORLD_H*h
-        );
-    }
-
-
-    /* Алина */
-
-    mctx.fillStyle="#ffd52b";
-
-    mctx.beginPath();
-
-    mctx.arc(
-        alina.x/WORLD_W*w,
-        alina.y/WORLD_H*h,
-        4,
-        0,
-        Math.PI*2
-    );
-
-    mctx.fill();
-
-
-    /* игрок */
-
-    mctx.fillStyle="#32cfff";
-
-    mctx.beginPath();
-
-    mctx.arc(
-        player.x/WORLD_W*w,
-        player.y/WORLD_H*h,
-        5,
-        0,
-        Math.PI*2
-    );
-
-    mctx.fill();
-}
-
-
-/* =========================================================
-   ИГРОВОЙ ЦИКЛ
-   ========================================================= */
-
-function gameLoop(){
-
-    movePlayer();
-
-    updateCars();
-
-    updateCamera();
-
-    drawWorld();
-
-    drawMiniMap();
-
-    requestAnimationFrame(gameLoop);
-}
-
-
-/* =========================================================
-   ЗАПУСК
-   ========================================================= */
-
-updateQuest();
-
-updateUI();
-
-showMessage(
-    "Добро пожаловать в «Новый Шаг»! 🏙️"
-);
-
-gameLoop();
+/* =========================================
+   ДАЛЬШЕ БУДЕТ КАРТА
+========================================= */
 
 </script>
 
