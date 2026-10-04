@@ -21,24 +21,24 @@ canvas{
     height:100%;
     background:#7fc96b;
 }
-
-
 #info{
     position:fixed;
     top:10px;
     left:10px;
     right:10px;
-    z-index:10;
+    z-index:1000;
     padding:12px;
     border-radius:15px;
     background:rgba(0,0,0,.75);
     color:white;
     font-size:16px;
+    box-sizing:border-box;
 }
 
-#quest{
+ #quest{
     margin-top:6px;
     font-size:14px;
+    line-height:20px;
 }
 
 #message{
@@ -56,24 +56,29 @@ canvas{
 }
 
 #controls{
-    position:fixed;
+   position:fixed;
     bottom:20px;
     left:20px;
-    z-index:20;
+    z-index:1000;
+    display:block; 
 }
 
 button{
+  button{
+    width:55px;
+    height:55px;
+    padding:0;
+    margin:3px;
     border:none;
     border-radius:14px;
-    padding:15px 20px;
-    margin:3px;
-    font-size:20px;
     background:white;
+    font-size:24px; 
 }
 
 #up,#down{
     display:block;
-    margin-left:58px;
+    margin-left:62px !important;
+
 }
 
 #interact{
