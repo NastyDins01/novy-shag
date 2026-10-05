@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Город по ту сторону</title>
+<style>
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+html,body{
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#05060a;
+color:#fff;
+font-family:Arial,sans-serif;
+}
+body{
+touch-action:none;
+}
+#game{
+position:fixed;
+inset:0;
+overflow:hidden;
+background:#070912;
+}
+canvas{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+}
+/* START SCREEN */
+#startScreen{
+position:absolute;
+inset:0;
+z-index:100;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:25px;
+background:
+radial-gradient(circle at 50% 38%,rgba(137,22,42,.22),transparent 28%),
+linear-gradient(#07070d,#0b0b13 55%,#030408);
+}
+.startContent{
+width:min(700px,100%);
+}
+.smallTitle{
+color:#aaa;
+font-size:11px;
+letter-spacing:5px;
+margin-bottom:20px;
+}
+h1{
+margin:0;
+font-size:clamp(38px,10vw,76px);
+line-height:.95;
+letter-spacing:5px;
+text-shadow:
+0 0 8px rgba(255,50,70,.6),
+0 0 35px rgba(255,20,40,.25);
+}
+.startText{
+max-width:530px;
+margin:25px auto;
+color:#bbbcc4;
+line-height:1.7;
+font-size:14px;
+}
+#startButton{
+padding:14px 35px;
+border:1px solid rgba(255,100,100,.4);
+border-radius:8px;
+background:#711c2c;
+color:white;
+font-weight:bold;
+letter-spacing:2px;
+font-size:14px;
+}
+/* HUD */
+#hud{
+position:absolute;
+top:15px;
+left:15px;
+z-index:20;
+width:330px;
+padding:13px;
+background:rgba(5,7,13,.82);
+border:1px solid rgba(255,255,255,.13);
+border-radius:14px;
+backdrop-filter:blur(10px);
+}
+.gameName{
+font-size:15px;
+font-weight:bold;
+letter-spacing:2px;
+margin-bottom:10px;
+}
+.label{
+color:#888e99;
+font-size:10px;
+text-transform:uppercase;
+letter-spacing:1px;
+}
+.bar{
+height:7px;
+margin:4px 0 8px;
+border-radius:20px;
+background:#20242c;
+overflow:hidden;
+}
+#healthBar{
+width:100%;
+height:100%;
+background:#a93649;
+}
+#energyBar{
+width:100%;
+height:100%;
+background:#4e82ae;
+}
+#clock{
+color:#969ba5;
+font-size:10px;
+margin-top:3px;
+}
+#mission{
+margin-top:10px;
+padding-top:10px;
+border-top:1px solid rgba(255,255,255,.1);
+font-size:12px;
+line-height:1.5;
+}
+/* INVENTORY */
+#inventory{
+position:absolute;
+top:15px;
+right:15px;
+z-index:20;
+min-width:145px;
+padding:11px 13px;
+background:rgba(5,7,13,.82);
+border:1px solid rgba(255,255,255,.13);
+border-radius:14px;
+backdrop-filter:blur(10px);
+font-size:12px;
+line-height:1.7;
+}
+/* MESSAGE */
+#message{
+position:absolute;
+left:50%;
+bottom:150px;
+transform:translateX(-50%);
+z-index:40;
+width:min(600px,calc(100% - 30px));
+padding:12px 15px;
+background:rgba(4,6,11,.93);
+border:1px solid rgba(255,255,255,.16);
+border-radius:12px;
+text-align:center;
+font-size:13px;
+line-height:1.45;
+opacity:0;
+pointer-events:none;
+transition:.25s;
+}
+#message.show{
+opacity:1;
+}
+/* DIALOG */
+#dialog{
+display:none;
+position:absolute;
+left:50%;
+bottom:20px;
+transform:translateX(-50%);
+z-index:60;
+width:min(650px,calc(100% - 25px));
+padding:18px;
+background:rgba(4,6,11,.97);
+border:1px solid rgba(255,255,255,.18);
+border-radius:17px;
+}
+#dialogName{
+font-size:17px;
+font-weight:bold;
+margin-bottom:8px;
+}
+#dialogText{
+color:#d5d7dd;
+font-size:14px;
+line-height:1.55;
+}
+#dialogButton{
+width:100%;
+margin-top:13px;
+padding:11px;
+border:0;
+border-radius:9px;
+background:#dedfe3;
+color:#11131a;
+font-weight:bold;
+}
+/* MOBILE CONTROLS */
+#controls{
+position:absolute;
+left:17px;
+bottom:18px;
+z-index:30;
+width:155px;
+height:155px;
+}
+.control{
+position:absolute;
+width:48px;
+height:48px;
+display:flex;
+align-items:center;
+justify-content:center;
+border:1px solid rgba(255,255,255,.16);
+border-radius:13px;
+background:rgba(8,11,18,.8);
+color:#fff;
+font-size:20px;
+user-select:none;
+}
+#up{
+top:0;
+left:53px;
+}
+#down{
+bottom:0;
+left:53px;
+}
+#left{
+left:0;
+top:53px;
+}
+#right{
+right:0;
+top:53px;
+}
+#action{
+position:absolute;
+right:25px;
+bottom:37px;
+z-index:30;
+width:76px;
+height:76px;
+border-radius:50%;
+border:1px solid rgba(255,100,100,.35);
+background:rgba(105,25,39,.85);
+color:#fff;
+font-size:11px;
+font-weight:bold;
+}
+#hint{
+position:absolute;
+right:20px;
+bottom:125px;
+z-index:20;
+color:#999da7;
+text-align:right;
+font-size:10px;
+line-height:1.5;
+}
+max-width:600px{
+#hud{
+width:245px;
+}
+#inventory{
+top:115px;
+right:15px;
+}
+#hint{
+display:none;
+}
+}
+</style>
+</head>
+<body>
+<div id="game">
+<canvas id="canvas"></canvas>
+<div id="startScreen">
+<div class="startContent">
+<div class="smallTitle">
+НЕИЗВЕСТНОЕ МЕСТО · 03:17
+</div>
+<h1>
+ГОРОД
+
+ПО ТУ СТОРОНУ
+</h1>
+<div class="startText">
+Мужчина просыпается ночью посреди незнакомого города.
+Он не знает, как сюда попал.
+Телефон не ловит сеть.
+Вокруг нет почти ни одного человека.
+Ему нужно найти еду, людей и дорогу домой.
+</div>
+<button id="startButton">
+НАЧАТЬ ИГРУ
+</button>
+</div>
+</div>
+<div id="hud">
+<div class="gameName">
+ГОРОД ПО ТУ СТОРОНУ
+</div>
+<div class="label">Здоровье</div>
+<div class="bar">
+<div id="healthBar"></div>
+</div>
+<div class="label">Энергия</div>
+<div class="bar">
+<div id="energyBar"></div>
+</div>
+<div id="clock">
+03:17
+</div>
+<div id="mission">
+<b>Первая миссия</b>
+
+Найди еду.
+</div>
+</div>
+<div id="inventory">
+🎒 Инвентарь<
+🍞 Еда: <span id="foodCount">0</span><b
+💧 Вода: <span id="waterCount">0</span><br
+🔑 Ключ: <span id="keyCount">нет</span>
+</div>
+<div id="message"></div>
+<div id="dialog">
+<div id="dialogName">
+Незнакомец
+</div>
+<div id="dialogText"></div>
+<button id="dialogButton">
+Продолжить
+</button>
+</div>
+<div id="hint">
+ПК: WASD / стрелки
+
+E — действие
+</div>
+<div id="controls">
+<div class="control" id="up">▲</div>
+<div class="control" id="left">◀</div>
+<div class="control" id="right">▶</div>
+<div class="control" id="down">▼</div>
+</div>
+<button id="action">
+ДЕЙСТВИЕ
+</button>
+</div>
+<script>
+/* =========================================================
+GAME
+========================================================= */
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+let W=innerWidth;
+let H=innerHeight;
+function resize(){
+W=innerWidth;
+H=innerHeight;
+canvas.width=W*devicePixelRatio;
+canvas.height=H*devicePixelRatio;
+canvas.style.width=W+"px";
+canvas.style.height=H+"px";
+ctx.setTransform(
+devicePixelRatio,
+0,
+0,
+devicePixelRatio,
+0,
+0
+);
+}
+resize();
+addEventListener("resize",resize);
+/* WORLD */
+const WORLD_W=3200;
+const WORLD_H=2400;
+/* PLAYER */
+const player={
+x:1600,
+y:1200,
+speed:3,
+health:100,
+energy:100
+};
+/* CAMERA */
+const camera={
+x:0,
+y:0
+};
+/* INVENTORY */
+const inventory={
+food:0,
+water:0,
+key:false
+};
+/* GAME STATE */
+let started=false;
+let dialogOpen=false;
+let mission=0;
+let worldTime=0;
+let lastTime=performance.now();
+const keys={};
+/* BUILDINGS */
+const buildings=[];
+function addBuilding(x,y,w,h,type=0){
+buildings.push({
+x,
+y,
+w,
+h,
+type
+});
+}
+/* CITY BLOCKS */
+addBuilding(100,100,390,270,0);
+addBuilding(610,110,300,290,1);
+addBuilding(1040,100,390,280,2);
+addBuilding(1540,110,350,290,0);
+addBuilding(2010,100,410,280,1);
+addBuilding(2550,120,430,270,2);
+addBuilding(110,620,350,300,2);
+addBuilding(570,600,350,300,0);
+addBuilding(1020,620,340,300,1);
+addBuilding(1460,600,390,320,2);
+addBuilding(1940,610,350,300,0);
+addBuilding(2410,600,420,300,1);
+addBuilding(120,1130,350,320,1);
+addBuilding(580,1150,310,310,2);
+addBuilding(1010,1140,360,330,0);
+addBuilding(1480,1160,380,300,1);
+addBuilding(1960,1130,390,340,2);
+addBuilding(2440,1150,390,320,0);
+addBuilding(120,1670,370,320,0);
+addBuilding(610,1690,320,300,1);
+addBuilding(1080,1660,370,330,2);
+addBuilding(1550,1680,390,310,0);
+addBuilding(2040,1660,390,330,1);
+addBuilding(2530,1690,400,300,2);
+/* ROADS */
+const roads=[
+{x:0,y:440,w:WORLD_W,h:125},
+{x:0,y:950,w:WORLD_W,h:125},
+{x:0,y:1515,w:WORLD_W,h:125},
+{x:0,y:2025,w:WORLD_W,h:120},
+{x:470,y:0,w:120,h:WORLD_H},
+{x:920,y:0,w:120,h:WORLD_H},
+{x:1430,y:0,w:120,h:WORLD_H},
+{x:1890,y:0,w:120,h:WORLD_H},
+{x:2420,y:0,w:120,h:WORLD_H}
+];
+/* FOREST */
+const trees=[];
+for(let i=0;i<230;i++){
+trees.push({
+x:30+(i*173)%3140,
+y:30+(i*257)%2340,
+scale:.7+(i%5)*.1
+});
+}
+/* STREET LIGHTS */
+const lights=[];
+for(let x=150;x<WORLD_W;x+=145){
+for(let y=500;y<WORLD_H;y+=300){
+lights.push({
+x:x+((y/300)%2)*50,
+y
+});
+}
+}
+/* ITEMS */
+const food={
+x:790,
+y:1080,
+collected:false
+};
+const water={
+x:1700,
+y:510,
+collected:false
+};
+/* NPC */
+const npcs=[
+{
+x:1150,
+y:500,
+name:"Незнакомка",
+color:"#7e526a",
+text:[
+"Ты тоже здесь впервые?",
+"Я проснулась три дня назад.",
+"Никто не знает, где находится этот город.",
+"Телефоны здесь не работают.",
+"Если хочешь выбраться — ищи старую автобусную станцию."
+]
+},
+{
+x:1600,
+y:1030,
+name:"Мужчина у магазина",
+color:"#526b83",
+text:[
+"Не помню, когда последний раз видел нормальную дорогу.",
+"Город постоянно меняется.",
+"Старая станция находится на севере.",
+"Но ночью туда лучше не ходить."
+]
+},
+{
+x:2160,
+y:520,
+name:"Пожилая женщина",
+color:"#776750",
+text:[
+"Если услышишь радио — не отвечай.",
+"Оно иногда называет имена людей.",
+"Тех, кто отвечает, потом никто не видит.",
+"И ещё... не приближайся к красным фонарям."
+]
+}
+];
+/* RAIN */
+const rain=[];
+for(let i=0;i<280;i++){
+rain.push({
+x:Math.random()*W,
+y:Math.random()*H,
+speed:8+Math.random()*10,
+length:8+Math.random()*15
+});
+}
+/* INPUT */
+addEventListener("keydown",e=>{
+keys[e.key.toLowerCase()]=true;
+if(e.key.toLowerCase()==="e"){
+interact();
+}
+});
+addEventListener("keyup",e=>{
+keys[e.key.toLowerCase()]=false;
+});
+/* MOBILE */
+function setupButton(id,key){
+const element=document.getElementById(id);
+element.addEventListener("pointerdown",e=>{
+e.preventDefault();
+keys[key]=true;
+});
+const release=e=>{
+e.preventDefault();
+keys[key]=false;
+};
+element.addEventListener("pointerup",release);
+element.addEventListener("pointercancel",release);
+element.addEventListener("pointerleave",release);
+}
+setupButton("up","arrowup");
+setupButton("down","arrowdown");
+setupButton("left","arrowleft");
+setupButton("right","arrowright");
+document.getElementById("action").addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+interact();
+}
+);
+/* COLLISION */
+function collision(x,y){
+const r=18;
+for(const b of buildings){
+if(
+x+r>b.x &&
+x-r<b.x+b.w &&
+y+r>b.y &&
+y-r<b.y+b.h
+){
+return true;
+}
+}
+return false;
+}
+/* DISTANCE */
+function distance(a,b){
+return Math.hypot(
+a.x-b.x,
+a.y-b.y
+);
+}
+/* PLAYER */
+function movePlayer(dt){
+if(dialogOpen)return;
+let dx=0;
+let dy=0;
+if(keys["w"]||keys["arrowup"])dy--;
+if(keys["s"]||keys["arrowdown"])dy++;
+if(keys["a"]||keys["arrowleft"])dx--;
+if(keys["d"]||keys["arrowright"])dx++;
+if(dx||dy){
+const len=Math.hypot(dx,dy);
+dx/=len;
+dy/=len;
+const speed=
+player.speed*
+(player.energy>0?1:.55);
+const nx=
+player.x+
+dx*speed*dt;
+const ny=
+player.y+
+dy*speed*dt;
+if(!collision(nx,player.y))
+player.x=nx;
+if(!collision(player.x,ny))
+player.y=ny;
+player.energy-=.025*dt;
+if(player.energy<0)
+player.energy=0;
+}else{
+player.energy+=.008*dt;
+if(player.energy>100)
+player.energy=100;
+}
+player.x=Math.max(
+20,
+Math.min(WORLD_W-20,player.x)
+);
+player.y=Math.max(
+20,
+Math.min(WORLD_H-20,player.y)
+);
+}
+/* CAMERA */
+function updateCamera(){
+camera.x=player.x-W/2;
+camera.y=player.y-H/2;
+camera.x=Math.max(
+0,
+Math.min(WORLD_W-W,camera.x)
+);
+camera.y=Math.max(
+0,
+Math.min(WORLD_H-H,camera.y)
+);
+}
+/* SKY */
+function drawSky(){
+const gradient=
+ctx.createLinearGradient(
+0,
+0,
+0,
+WORLD_H
+);
+gradient.addColorStop(
+0,
+"#160813"
+);
+gradient.addColorStop(
+.25,
+"#260e1b"
+);
+gradient.addColorStop(
+.5,
+"#111722"
+);
+gradient.addColorStop(
+1,
+"#060b11"
+);
+ctx.fillStyle=gradient;
+ctx.fillRect(
+0,
+0,
+WORLD_W,
+WORLD_H
+);
+}
+/* ROADS */
+function drawRoads(){
+for(const road of roads){
+ctx.fillStyle="#292e38";
+ctx.fillRect(
+road.x,
+road.y,
+road.w,
+road.h
+);
+ctx.strokeStyle=
+"rgba(160,165,175,.35)";
+ctx.lineWidth=2;
+ctx.setLineDash([30,30]);
+ctx.beginPath();
+if(road.w>road.h){
+ctx.moveTo(
+road.x,
+road.y+road.h/2
+);
+ctx.lineTo(
+road.x+road.w,
+road.y+road.h/2
+);
+}else{
+ctx.moveTo(
+road.x+road.w/2,
+road.y
+);
+ctx.lineTo(
+road.x+road.w/2,
+road.y+road.h
+);
+}
+ctx.stroke();
+ctx.setLineDash([]);
+}
+}
+/* TREES */
+function drawTrees(){
+for(const t of trees){
+if(
+t.x<camera.x-100||
+t.x>camera.x+W+100||
+t.y<camera.y-100||
+t.y>camera.y+H+100
+)continue;
+ctx.save();
+ctx.translate(t.x,t.y);
+ctx.scale(t.scale,t.scale);
+ctx.fillStyle="#17100f";
+ctx.fillRect(
+-4,
+3,
+8,
+28
+);
+ctx.fillStyle="#10241e";
+ctx.beginPath();
+ctx.arc(
+0,
+-8,
+21,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.beginPath();
+ctx.arc(
+-11,
+3,
+16,
+0,
+Math.PI*2
+);
+ctx.arc(
+11,
+3,
+16,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.restore();
+}
+}
+/* BUILDINGS */
+function drawBuildings(){
+buildings.forEach((b,index)=>{
+ctx.fillStyle="#090b10";
+ctx.fillRect(
+b.x+8,
+b.y+10,
+b.w,
+b.h
+);
+const wallColors=[
+"#1c2029",
+"#20232d",
+"#24232c"
+];
+ctx.fillStyle=
+wallColors[b.type];
+ctx.fillRect(
+b.x,
+b.y,
+b.w,
+b.h
+);
+ctx.strokeStyle="#3c424e";
+ctx.lineWidth=3;
+ctx.strokeRect(
+b.x,
+b.y,
+b.w,
+b.h
+);
+ctx.fillStyle="#11141b";
+ctx.fillRect(
+b.x,
+b.y,
+b.w,
+30
+);
+const columns=
+Math.max(
+2,
+Math.floor(b.w/65)
+);
+const rows=
+Math.max(
+2,
+Math.floor(b.h/70)
+);
+for(let x=0;x<columns;x++){
+for(let y=0;y<rows;y++){
+const wx=
+b.x+
+18+
+x*(b.w-36)/columns;
+const wy=
+b.y+
+47+
+y*(b.h-65)/rows;
+const lit=
+(x+y+index)%5===0;
+ctx.fillStyle=
+lit
+?"rgba(208,112,68,.72)"
+:"#2b3440";
+ctx.fillRect(
+wx,
+wy,
+21,
+27
+);
+}
+}
+if(index%5===0){
+ctx.fillStyle="#6c1d2b";
+ctx.fillRect(
+b.x+b.w/2-24,
+b.y+b.h-28,
+48,
+16
+);
+ctx.fillStyle="#e34b58";
+ctx.font="bold 9px Arial";
+ctx.textAlign="center";
+ctx.fillText(
+"17",
+b.x+b.w/2,
+b.y+b.h-16
+);
+}
+});
+}
+/* LIGHTS */
+function drawLights(){
+for(const light of lights){
+if(
+light.x<camera.x-100||
+light.x>camera.x+W+100||
+light.y<camera.y-100||
+light.y>camera.y+H+100
+)continue;
+ctx.strokeStyle="#171a20";
+ctx.lineWidth=5;
+ctx.beginPath();
+ctx.moveTo(
+light.x,
+light.y
+);
+ctx.lineTo(
+light.x,
+light.y-52
+);
+ctx.stroke();
+const glow=
+ctx.createRadialGradient(
+light.x,
+light.y-52,
+2,
+light.x,
+light.y-52,
+75
+);
+glow.addColorStop(
+0,
+"rgba(255,177,91,.35)"
+);
+glow.addColorStop(
+1,
+"rgba(255,100,50,0)"
+);
+ctx.fillStyle=glow;
+ctx.beginPath();
+ctx.arc(
+light.x,
+light.y-52,
+75,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#e2a266";
+ctx.beginPath();
+ctx.arc(
+light.x,
+light.y-52,
+3,
+0,
+Math.PI*2
+);
+ctx.fill();
+}
+}
+/* ITEMS */
+function drawFood(){
+if(food.collected)return;
+ctx.save();
+ctx.translate(
+food.x,
+food.y
+);
+ctx.fillStyle="rgba(0,0,0,.45)";
+ctx.beginPath();
+ctx.ellipse(
+0,
+13,
+21,
+8,
+0,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#d29d4a";
+ctx.fillRect(
+-16,
+-10,
+32,
+22
+);
+ctx.fillStyle="#f0d08a";
+ctx.fillRect(
+-10,
+-16,
+20,
+7
+);
+ctx.fillStyle="#fff";
+ctx.font="bold 11px Arial";
+ctx.textAlign="center";
+ctx.fillText(
+"ЕДА",
+0,
+-25
+);
+ctx.restore();
+}
+function drawWater(){
+if(water.collected)return;
+ctx.save();
+ctx.translate(
+water.x,
+water.y
+);
+ctx.fillStyle="rgba(0,0,0,.45)";
+ctx.beginPath();
+ctx.ellipse(
+0,
+13,
+16,
+6,
+0,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#4c8fc4";
+ctx.fillRect(
+-9,
+-18,
+18,
+32
+);
+ctx.fillStyle="#b8def5";
+ctx.fillRect(
+-7,
+-23,
+14,
+6
+);
+ctx.fillStyle="#fff";
+ctx.font="bold 10px Arial";
+ctx.textAlign="center";
+ctx.fillText(
+"ВОДА",
+0,
+-31
+);
+ctx.restore();
+}
+/* NPC */
+function drawNPC(npc){
+ctx.save();
+ctx.translate(
+npc.x,
+npc.y
+);
+ctx.fillStyle="rgba(0,0,0,.5)";
+ctx.beginPath();
+ctx.ellipse(
+0,
+20,
+19,
+8,
+0,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle=npc.color;
+ctx.fillRect(
+-13,
+-2,
+26,
+32
+);
+ctx.fillStyle="#dcae8b";
+ctx.beginPath();
+ctx.arc(
+0,
+-15,
+12,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#211e22";
+ctx.beginPath();
+ctx.arc(
+0,
+-19,
+12,
+Math.PI,
+Math.PI*2
+);
+ctx.fill();
+ctx.restore();
+}
+/* PLAYER */
+function drawPlayer(){
+ctx.save();
+ctx.translate(
+player.x,
+player.y
+);
+ctx.fillStyle="rgba(0,0,0,.55)";
+ctx.beginPath();
+ctx.ellipse(
+0,
+21,
+20,
+8,
+0,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#252e3b";
+ctx.fillRect(
+-14,
+-2,
+28,
+33
+);
+ctx.fillStyle="#dcae8b";
+ctx.beginPath();
+ctx.arc(
+0,
+-15,
+12,
+0,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#17181c";
+ctx.beginPath();
+ctx.arc(
+0,
+-19,
+12,
+Math.PI,
+Math.PI*2
+);
+ctx.fill();
+ctx.fillStyle="#dedede";
+ctx.fillRect(
+-8,
+5,
+16,
+3
+);
+ctx.restore();
+}
+/* ATMOSPHERE */
+function drawRedGlow(){
+const g=
+ctx.createRadialGradient(
+W*.5,
+H*.08,
+20,
+W*.5,
+H*.08,
+H*.8
+);
+g.addColorStop(
+0,
+"rgba(150,20,45,.15)"
+);
+g.addColorStop(
+.55,
+"rgba(90,15,35,.04)"
+);
+g.addColorStop(
+1,
+"rgba(0,0,0,0)"
+);
+ctx.fillStyle=g;
+ctx.fillRect(
+0,
+0,
+W,
+H
+);
+}
+function drawFog(){
+const g=
+ctx.createRadialGradient(
+W/2,
+H/2,
+80,
+W/2,
+H/2,
+Math.max(W,H)*.75
+);
+g.addColorStop(
+0,
+"rgba(140,145,165,0)"
+);
+g.addColorStop(
+.55,
+"rgba(80,90,110,.06)"
+);
+g.addColorStop(
+1,
+"rgba(0,0,0,.55)"
+);
+ctx.fillStyle=g;
+ctx.fillRect(
+0,
+0,
+W,
+H
+);
+}
+function drawRain(){
+ctx.strokeStyle=
+"rgba(180,195,215,.17)";
+ctx.lineWidth=1;
+for(const drop of rain){
+drop.y+=drop.speed;
+if(drop.y>H+20){
+drop.y=-20;
+drop.x=Math.random()*W;
+}
+ctx.beginPath();
+ctx.moveTo(
+drop.x,
+drop.y
+);
+ctx.lineTo(
+drop.x-3,
+drop.y+drop.length
+);
+ctx.stroke();
+}
+}
+/* INTERACTION */
+function drawInteraction(){
+let target=null;
+let nearest=9999;
+if(!food.collected){
+const d=
+distance(player,food);
+if(d<nearest){
+nearest=d;
+target="food";
+}
+}
+if(!water.collected){
+const d=
+distance(player,water);
+if(d<nearest){
+nearest=d;
+target="water";
+}
+}
+for(const npc of npcs){
+const d=
+distance(player,npc);
+if(d<nearest){
+nearest=d;
+target="npc";
+}
+}
+if(nearest<90){
+const x=
+player.x-camera.x;
+const y=
+player.y-camera.y-55;
+ctx.fillStyle=
+"rgba(0,0,0,.82)";
+ctx.beginPath();
+ctx.roundRect(
+x-58,
+y-16,
+116,
+32,
+8
+);
+ctx.fill();
+ctx.fillStyle="#fff";
+ctx.font="bold 11px Arial";
+ctx.textAlign="center";
+if(target==="food"){
+ctx.fillText(
+"E — взять еду",
+x,
+y+4
+);
+}else if(target==="water"){
+ctx.fillText(
+"E — взять воду",
+x,
+y+4
+);
+}else{
+ctx.fillText(
+"E — поговорить",
+x,
+y+4
+);
+}
+}
+}
+/* RENDER */
+function render(){
+ctx.clearRect(
+0,
+0,
+W,
+H
+);
+ctx.save();
+ctx.translate(
+-camera.x,
+-camera.y
+);
+drawSky();
+drawTrees();
+drawRoads();
+drawBuildings();
+drawLights();
+drawFood();
+drawWater();
+for(const npc of npcs)
+drawNPC(npc);
+drawPlayer();
+ctx.restore();
+drawRedGlow();
+drawFog();
+drawRain();
+drawInteraction();
+}
+/* INTERACTION */
+function interact(){
+if(!started||dialogOpen)
+return;
+/* FOOD */
+if(
+!food.collected &&
+distance(player,food)<90
+){
+food.collected=true;
+inventory.food++;
+player.energy=
+Math.min(
+100,
+player.energy+30
+);
+updateInventory();
+mission=1;
+document.getElementById(
+"mission"
+).innerHTML=
+"<b>Первая миссия</b>
+
+"Поговори с незнакомкой у дороги.";
+showMessage(
+"Ты нашёл еду. Теперь нужно найти человека."
+);
+return;
+}
+/* WATER */
+if(
+!water.collected &&
+distance(player,water)<90
+){
+water.collected=true;
+
+
